@@ -1,0 +1,10 @@
+namespace TicketGo.Domain.Interfaces
+{
+    public interface IOrderRepository : IRepository<Order>
+    {
+        Task<Order> GetByIdAsync(int id);
+        Task AddAsync(Order order);
+        Task UpdateAsync(Order order);
+        Task DeleteAsync(int id);
+    }
+}
