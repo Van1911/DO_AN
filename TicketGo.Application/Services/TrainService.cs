@@ -43,5 +43,86 @@ namespace TicketGo.Application.Services
                 DateStart = t.DateStart
             }).ToList();
         }
+        public async Task<List<TrainDto>> GetAllTrainsAsync()
+        {
+            var trains = await _trainRepository.GetAllAsync();
+            return trains.Select(t => new TrainDto
+            {
+                IdTrain = t.IdTrain,
+                NameTrain = t.NameTrain,
+                DateStart = t.DateStart,
+                IdTrainRoute = t.IdTrainRoute,
+                TrainRouteName = t.IdTrainRouteNavigation != null 
+                    ? $"{t.IdTrainRouteNavigation.PointStart} - {t.IdTrainRouteNavigation.PointEnd}" 
+                    : null,
+                CoefficientTrain = t.CoefficientTrain
+            }).ToList();
+        }
+
+        public async Task<TrainDto> GetTrainByIdAsync(int id)
+        {
+            var train = await _trainRepository.GetByIdAsync(id);
+            if (train == null)
+            {
+                return null;
+            }
+
+            return new TrainDto
+            {
+                IdTrain = train.IdTrain,
+                NameTrain = train.NameTrain,
+                DateStart = train.DateStart,
+                IdTrainRoute = train.IdTrainRoute,
+                TrainRouteName = train.IdTrainRouteNavigation != null 
+                    ? $"{train.IdTrainRouteNavigation.PointStart} - {train.IdTrainRouteNavigation.PointEnd}" 
+                    : null,
+                CoefficientTrain = train.CoefficientTrain
+            };
+        }
+
+        public async Task CreateTrainAsync(CreateUpdateTrainDto trainDto)
+        {
+            var train = new Train
+            {
+                NameTrain = trainDto.NameTrain,
+                DateStart = trainDto.DateStart,
+                IdTrainRoute = trainDto.IdTrainRoute,
+                CoefficientTrain = trainDto.CoefficientTrain
+            };
+
+            await _trainRepository.AddAsync(train);
+        }
+
+        public async Task UpdateTrainAsync(int id, CreateUpdateTrainDto trainDto)
+        {
+            var train = await _trainRepository.GetByIdAsync(id);
+            if (train == null)
+            {
+                throw new Exception("Train not found");
+            }
+
+            train.NameTrain = trainDto.NameTrain;
+            train.DateStart = trainDto.DateStart;
+            train.IdTrainRoute = trainDto.IdTrainRoute;
+            train.CoefficientTrain = trainDto.CoefficientTrain;
+
+            await _trainRepository.UpdateAsync(train);
+        }
+
+        public async Task DeleteTrainAsync(int id)
+        {
+            await _trainRepository.DeleteAsync(id);
+        }
+
+        public async Task<List<TrainRouteDto>> GetAllTrainRoutesAsync()
+        {
+            var trainRoutes = await _trainRouteRepository.GetAllAsync();
+            return trainRoutes.Select(tr => new TrainRouteDto
+            {
+                IdTrainRoute = tr.IdTrainRoute,
+                PointStart = tr.PointStart,
+                PointEnd = tr.PointEnd
+            }).ToList();
+        }
     }
 }

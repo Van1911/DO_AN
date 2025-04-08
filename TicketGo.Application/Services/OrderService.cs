@@ -6,6 +6,8 @@ namespace TicketGo.Application.Services
 {
     public class OrderService : IOrderService
     {
+        private readonly ICustomerRepository _customerRepository;
+        private readonly IDiscountRepository _discountRepository;
         private readonly ICoachRepository _coachRepository;
         private readonly IOrderRepository _orderRepository;
         private readonly ISeatRepository _seatRepository;
@@ -17,15 +19,57 @@ namespace TicketGo.Application.Services
             IOrderRepository orderRepository,
             ISeatRepository seatRepository,
             ITicketRepository ticketRepository,
-            IOrderTicketRepository orderTicketRepository)
+            IOrderTicketRepository orderTicketRepository,
+            ICustomerRepository customerRepository,
+            IDiscountRepository discountRepository)
         {
             _coachRepository = coachRepository;
             _orderRepository = orderRepository;
             _seatRepository = seatRepository;
             _ticketRepository = ticketRepository;
             _orderTicketRepository = orderTicketRepository;
+            _customerRepository = customerRepository;
+            _discountRepository = discountRepository;
         }
+        public async Task<List<OrderDto>> GetAllOrdersAsync()
+        {
+            var orders = await _orderRepository.GetAllAsync();
+            return orders.Select(o => new OrderDto
+            {
+                IdOrder = o.IdOrder,
+                UnitPrice = o.UnitPrice,
+                DateOrder = o.DateOrder,
+                IdTicket = o.IdTicket,
+                IdDiscount = o.IdDiscount,
+                DiscountName = o.IdDiscountNavigation?.IdDiscount.ToString(), // Có thể thay bằng thuộc tính phù hợp của Discount
+                NameCus = o.NameCus,
+                Phone = o.Phone,
+                IdCus = o.IdCus,
+                CustomerName = o.IdCusNavigation?.IdCus.ToString() // Có thể thay bằng thuộc tính phù hợp của Customer
+            }).ToList();
+        }
+        public async Task<OrderDto> GetOrderByIdAsync(int id)
+        {
+            var order = await _orderRepository.GetByIdAsync(id);
+            if (order == null)
+            {
+                return null;
+            }
 
+            return new OrderDto
+            {
+                IdOrder = order.IdOrder,
+                UnitPrice = order.UnitPrice,
+                DateOrder = order.DateOrder,
+                IdTicket = order.IdTicket,
+                IdDiscount = order.IdDiscount,
+                DiscountName = order.IdDiscountNavigation?.IdDiscount.ToString(), // Có thể thay bằng thuộc tính phù hợp của Discount
+                NameCus = order.NameCus,
+                Phone = order.Phone,
+                IdCus = order.IdCus,
+                CustomerName = order.IdCusNavigation?.IdCus.ToString() // Có thể thay bằng thuộc tính phù hợp của Customer
+            };
+        }
         public async Task<OrderTicketDto> GetOrderTicketDetailsAsync(int idCoach)
         {
             var coach = await _coachRepository.GetCoachWithRelatedDataAsync(idCoach);
@@ -109,5 +153,40 @@ namespace TicketGo.Application.Services
                 VehicleType = coachCategory
             };
         }
+        public async Task UpdateOrderAsync(int id, CreateUpdateOrderDto orderDto)
+        {
+            var order = await _orderRepository.GetByIdAsync(id);
+            if (order == null)
+            {
+                throw new Exception("Order not found");
+            }
+
+            order.UnitPrice = orderDto.UnitPrice;
+            order.DateOrder = orderDto.DateOrder;
+            order.IdTicket = orderDto.IdTicket;
+            order.IdDiscount = orderDto.IdDiscount;
+            order.NameCus = orderDto.NameCus;
+            order.Phone = orderDto.Phone;
+            order.IdCus = orderDto.IdCus;
+
+            await _orderRepository.UpdateAsync(order);
+        }
+
+        public async Task DeleteOrderAsync(int id)
+        {
+            await _orderRepository.DeleteAsync(id);
+        }
+
+        public async Task<List<CustomerDto>> GetAllCustomersAsync()
+        {
+            var customers = await _customerRepository.GetAllAsync();
+            return customers.Select(c => new CustomerDto
+            {
+                IdCus = c.IdCus,
+                CustomerName = c.IdCus.ToString() // Có thể thay bằng thuộc tính phù hợp của Customer
+            }).ToList();
+        }
+
+       
     }
 }

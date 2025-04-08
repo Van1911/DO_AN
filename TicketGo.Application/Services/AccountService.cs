@@ -8,11 +8,13 @@ namespace TicketGo.Application.Services
     {
         private readonly IAccountRepository _accountRepository;
         private readonly ICustomerRepository _customerRepository;
+        private readonly IRoleRepository _roleRepository;
 
-        public AccountService(IAccountRepository accountRepository, ICustomerRepository customerRepository)
+        public AccountService(IAccountRepository accountRepository, ICustomerRepository customerRepository, IRoleRepository roleRepository)
         {
             _accountRepository = accountRepository;
             _customerRepository = customerRepository;
+            _roleRepository = roleRepository;
         }
 
         public async Task<bool> RegisterAsync(RegisterDto registerDto)
@@ -88,5 +90,89 @@ namespace TicketGo.Application.Services
         {
             return Guid.NewGuid().ToString().Substring(0, 6); // Lấy 6 ký tự đầu tiên
         }
+        public async Task<List<AccountDto>> GetAllAccountsAsync()
+        {
+            var accounts = await _accountRepository.GetAllAsync();
+            return accounts.Select(a => new AccountDto
+            {
+                IdAccount = a.IdAccount,
+                Phone = a.Phone,
+                Email = a.Email,
+                Password = a.Password,
+                Sex = a.Sex,
+                DateOfBirth = a.DateOfBirth,
+                IdRole = a.IdRole,
+                RoleName = a.IdRoleNavigation?.RoleName
+            }).ToList();
+        }
+
+        public async Task<AccountDto> GetAccountByIdAsync(int id)
+        {
+            var account = await _accountRepository.GetByIdAsync(id);
+            if (account == null)
+            {
+                return null;
+            }
+
+            return new AccountDto
+            {
+                IdAccount = account.IdAccount,
+                Phone = account.Phone,
+                Email = account.Email,
+                Password = account.Password,
+                Sex = account.Sex,
+                DateOfBirth = account.DateOfBirth,
+                IdRole = account.IdRole,
+                RoleName = account.IdRoleNavigation?.RoleName
+            };
+        }
+
+        public async Task CreateAccountAsync(CreateUpdateAccountDto accountDto)
+        {
+            var account = new Account
+            {
+                Phone = accountDto.Phone,
+                Email = accountDto.Email,
+                Password = accountDto.Password,
+                Sex = accountDto.Sex,
+                DateOfBirth = accountDto.DateOfBirth,
+                IdRole = accountDto.IdRole
+            };
+
+            await _accountRepository.AddAsync(account);
+        }
+
+        public async Task UpdateAccountAsync(int id, CreateUpdateAccountDto accountDto)
+        {
+            var account = await _accountRepository.GetByIdAsync(id);
+            if (account == null)
+            {
+                throw new Exception("Account not found");
+            }
+
+            account.Phone = accountDto.Phone;
+            account.Email = accountDto.Email;
+            account.Password = accountDto.Password;
+            account.Sex = accountDto.Sex;
+            account.DateOfBirth = accountDto.DateOfBirth;
+            account.IdRole = accountDto.IdRole;
+
+            await _accountRepository.UpdateAsync(account);
+        }
+
+        public async Task DeleteAccountAsync(int id)
+        {
+            await _accountRepository.DeleteAsync(id);
+        }
+
+        public async Task<List<RoleDto>> GetAllRolesAsync()
+        {
+            var roles = await _roleRepository.GetAllAsync();
+            return roles.Select(r => new RoleDto
+            {
+                IdRole = r.IdRole,
+                RoleName = r.RoleName
+            }).ToList();
+        }
     }
-}   
+}

@@ -13,6 +13,12 @@ namespace TicketGo.Infrastructure.Repositories
             _context = context;
         }
 
+        public async Task<List<Account>> GetAllAsync()
+        {
+            return await _context.Accounts
+                .Include(a => a.IdRoleNavigation)
+                .ToListAsync();
+        }
 
         public async Task AddAsync(Account account)
         {
@@ -28,6 +34,11 @@ namespace TicketGo.Infrastructure.Repositories
         public async Task<Account> GetByEmailAndPasswordAsync(string email, string password)
         {
             return await _context.Accounts.FirstOrDefaultAsync(x => x.Email == email && x.Password == password);
+        }
+        
+        public async Task<bool> ExistsAsync(int id)
+        {
+            return await _context.Accounts.AnyAsync(a => a.IdAccount == id);
         }
     }
 }

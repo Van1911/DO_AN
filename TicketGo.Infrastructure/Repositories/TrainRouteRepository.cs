@@ -39,5 +39,42 @@ namespace TicketGo.Infrastructure.Repositories
                               .Distinct()
                               .ToListAsync();
         }
+        
+        public async Task<List<TrainRoute>> GetAllAsync()
+        {
+            return await _context.TrainRoutes.ToListAsync();
+        }
+
+        public async Task<TrainRoute> GetByIdAsync(int id)
+        {
+            return await _context.TrainRoutes.FirstOrDefaultAsync(tr => tr.IdTrainRoute == id);
+        }
+
+        public async Task AddAsync(TrainRoute trainRoute)
+        {
+            await _context.TrainRoutes.AddAsync(trainRoute);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateAsync(TrainRoute trainRoute)
+        {
+            _context.TrainRoutes.Update(trainRoute);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            var trainRoute = await _context.TrainRoutes.FindAsync(id);
+            if (trainRoute != null)
+            {
+                _context.TrainRoutes.Remove(trainRoute);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<bool> ExistsAsync(int id)
+        {
+            return await _context.TrainRoutes.AnyAsync(tr => tr.IdTrainRoute == id);
+        }
     }
 }

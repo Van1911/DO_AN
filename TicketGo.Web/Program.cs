@@ -35,6 +35,8 @@ builder.Services.AddScoped<ICoachRepository, CoachRepository>();
 builder.Services.AddScoped<ISeatRepository, SeatRepository>();
 builder.Services.AddScoped<IOrderTicketRepository, OrderTicketRepository>();
 builder.Services.AddScoped<ITrainRouteRepository, TrainRouteRepository>();
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+builder.Services.AddScoped<IDiscountRepository, DiscountRepository>();
 // Đăng ký các repository khác nếu cần...
 
 // Đăng ký các service
@@ -42,6 +44,8 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ITicketService, TicketService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<ITrainService, TrainService>();
+builder.Services.AddScoped<ICoachService, CoachService>();
+builder.Services.AddScoped<ITrainRouteService, TrainRouteService>();
 
 // Đăng ký các service khác nếu cần...
 

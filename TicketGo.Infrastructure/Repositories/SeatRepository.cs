@@ -12,6 +12,11 @@ namespace TicketGo.Infrastructure.Repositories
         {
             _context = context;
         }
+        
+        public async Task<List<Seat>> GetAllAsync()
+        {
+            return await _context.Seats.ToListAsync();
+        }
 
         public async Task<Seat> GetByNameAndCoachIdAsync(string nameSeat, int idCoach)
         {

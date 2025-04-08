@@ -11,6 +11,11 @@ namespace TicketGo.Infrastructure.Repositories
         {
             _context = context;
         }
+        
+        public async Task<List<Customer>> GetAllAsync()
+        {
+            return await _context.Customers.ToListAsync();
+        }
 
         public async Task AddAsync(Customer customer)
         {

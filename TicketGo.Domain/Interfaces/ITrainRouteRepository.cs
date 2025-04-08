@@ -8,5 +8,7 @@ namespace TicketGo.Domain.Interfaces
         Task AddAsync(TrainRoute trainRoute);
         Task UpdateAsync(TrainRoute trainRoute);
         Task DeleteAsync(int id);
+        Task<List<TrainRoute>> GetAllAsync();
+        Task<bool> ExistsAsync(int id);
     }
 }

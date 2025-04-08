@@ -12,6 +12,11 @@ namespace TicketGo.Infrastructure.Repositories
         {
             _context = context;
         }
+        
+        public async Task<List<Train>> GetAllAsync()
+        {
+            return await _context.Trains.ToListAsync();
+        }
 
         public async Task<List<Train>> SearchTrainsAsync(string pointStart, string pointEnd, DateTime? departureDate, int page, int pageSize)
         {
@@ -39,5 +44,39 @@ namespace TicketGo.Infrastructure.Repositories
                 .Take(pageSize)
                 .ToListAsync();
         }
+
+        public async Task<Train> GetByIdAsync(int id)
+        {
+            return await _context.Trains
+                .Include(t => t.IdTrainRouteNavigation)
+                .FirstOrDefaultAsync(t => t.IdTrain == id);
+        }
+        public async Task AddAsync(Train train)
+        {
+            await _context.Trains.AddAsync(train);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateAsync(Train train)
+        {
+            _context.Trains.Update(train);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            var train = await _context.Trains.FindAsync(id);
+            if (train != null)
+            {
+                _context.Trains.Remove(train);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<bool> ExistsAsync(int id)
+        {
+            return await _context.Trains.AnyAsync(t => t.IdTrain == id);
+        }
     }
+    
 }
