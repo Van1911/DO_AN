@@ -1,23 +1,21 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using TicketGo.Application.Interfaces;
 using TicketGo.Application.Services;
 using TicketGo.Domain.Interfaces;
 using TicketGo.Infrastructure.Data;
 using TicketGo.Infrastructure.Repositories;
-
 using TicketGo.Web.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add services to the container
 builder.Services.AddControllersWithViews();
 
-// Configure DbContext with SQL Server
+// DB context
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Configure session
+// Session
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -26,7 +24,7 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-// Register repositories
+// Repositories
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ITicketRepository, TicketRepository>();
@@ -39,31 +37,36 @@ builder.Services.AddScoped<ITrainRouteRepository, TrainRouteRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IDiscountRepository, DiscountRepository>();
 
-// Register services
+// Services
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ITicketService, TicketService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<ITrainService, TrainService>();
 builder.Services.AddScoped<ICoachService, CoachService>();
 builder.Services.AddScoped<ITrainRouteService, TrainRouteService>();
-
-// Configure email settings
-// builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 builder.Services.AddScoped<IEmailSender, EmailSender>();
-
-// Register VnPay service
 builder.Services.AddScoped<IVNPayService, VNPayService>();
+
+// Cookie Authentication
+builder.Services.AddAuthentication("MyCookieAuth")
+    .AddCookie("MyCookieAuth", options =>
+    {
+        options.LoginPath = "/Access/Login";
+        options.AccessDeniedPath = "/Error/403";
+    });
+
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Middlewares
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 }
 else
 {
-    app.UseExceptionHandler("/Home/Error");
+    app.UseExceptionHandler("/Error/500");
     app.UseHsts();
 }
 
@@ -71,10 +74,11 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-// Chuyển hướng đến middleware xử lý lỗi 404
+
 app.UseStatusCodePagesWithReExecute("/Error/{0}");
 
 app.UseSession();
+app.UseAuthentication(); 
 app.UseAuthorization();
 
 app.MapControllerRoute(
