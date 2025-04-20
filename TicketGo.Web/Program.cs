@@ -47,6 +47,8 @@ builder.Services.AddScoped<ITrainRouteService, TrainRouteService>();
 builder.Services.AddScoped<IEmailSender, EmailSender>();
 builder.Services.AddScoped<IVNPayService, VNPayService>();
 
+builder.Services.AddHttpContextAccessor();
+
 // Cookie Authentication
 builder.Services.AddAuthentication("MyCookieAuth")
     .AddCookie("MyCookieAuth", options =>

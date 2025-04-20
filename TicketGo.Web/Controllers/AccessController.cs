@@ -6,11 +6,11 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace TicketGo.Web.Controllers
 {
-    public class AccountController : Controller
+    public class AccessController : Controller
     {
         private readonly IAccountService _accountService;
 
-        public AccountController(IAccountService accountService)
+        public AccessController(IAccountService accountService)
         {
             _accountService = accountService;
         }
