@@ -1,4 +1,4 @@
-﻿@model IEnumerable<DO_AN.Models.Account>
+﻿@model IEnumerable<TicketGo.Domain.Entities.Account>
 
 @{
     ViewData["Title"] = "Danh sách tài khoản";
@@ -42,7 +42,7 @@
                     <td>@Html.DisplayFor(modelItem => item.Password)</td>
                     <td>@((bool)item.Sex ? "Nữ" : "Nam")</td>
                     <td>@Html.DisplayFor(modelItem => item.DateOfBirth)</td>
-                    <td>@Html.DisplayFor(modelItem => item.IdRoleNavigation.NameRole)</td>
+                    <td>@Html.DisplayFor(modelItem => item.IdRoleNavigation.Name)</td>
                     <td>
                         <a class="btn btn-warning btn-sm" asp-action="Edit" asp-route-id="@item.IdAccount">Sửa</a>
                         <a class="btn btn-danger btn-sm" asp-action="Delete" asp-route-id="@item.IdAccount">Xóa</a>

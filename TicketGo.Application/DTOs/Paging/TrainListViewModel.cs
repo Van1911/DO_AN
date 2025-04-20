@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-using DO_AN.Models; // Đổi namespace thành tên của bạn
+﻿using TicketGo.Domain.Entities;
 
-namespace DO_AN.ViewModel.Paging
+namespace TicketGo.Application.DTOs.Paging
 {
     public class TrainListViewModel
     {

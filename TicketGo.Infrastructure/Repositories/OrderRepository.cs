@@ -1,5 +1,7 @@
 using TicketGo.Domain.Entities;
 using TicketGo.Domain.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using TicketGo.Infrastructure.Data;
 
 namespace TicketGo.Infrastructure.Repositories
 {
@@ -12,10 +14,67 @@ namespace TicketGo.Infrastructure.Repositories
             _context = context;
         }
 
+        public async Task<List<Order>> GetAllAsync()
+        {
+            return await _context.Orders
+                .Include(o => o.IdCusNavigation)
+                .Include(o => o.IdDiscountNavigation)
+                .Include(o => o.OrderTickets)
+                .ToListAsync();
+        }
+
+        public async Task<Order> GetByIdAsync(int id)
+        {
+            var order = await _context.Orders
+                .Include(o => o.IdCusNavigation)
+                .Include(o => o.IdDiscountNavigation)
+                .Include(o => o.OrderTickets)
+                .FirstOrDefaultAsync(o => o.IdOrder == id);
+
+            if (order == null)
+            {
+                throw new KeyNotFoundException($"Order with ID {id} not found.");
+            }
+
+            return order;
+        }
+
         public async Task AddAsync(Order order)
         {
             await _context.Orders.AddAsync(order);
             await _context.SaveChangesAsync();
         }
+
+        public async Task UpdateAsync(Order order)
+        {
+            var existingOrder = await _context.Orders.FindAsync(order.IdOrder);
+            if (existingOrder == null)
+            {
+                throw new KeyNotFoundException($"Order with ID {order.IdOrder} not found.");
+            }
+
+            _context.Entry(existingOrder).CurrentValues.SetValues(order);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            var order = await _context.Orders.FindAsync(id);
+            if (order == null)
+            {
+                throw new KeyNotFoundException($"Order with ID {id} not found.");
+            }
+
+            _context.Orders.Remove(order);
+            await _context.SaveChangesAsync();
+        }
+
+        // Uncomment and implement if needed
+        /*
+        public async Task<bool> ExistsAsync(int id)
+        {
+            return await _context.Orders.AnyAsync(o => o.IdOrder == id);
+        }
+        */
     }
 }

@@ -1,3 +1,4 @@
+using TicketGo.Domain.Entities;
 using TicketGo.Application.DTOs;
 
 namespace TicketGo.Application.Interfaces

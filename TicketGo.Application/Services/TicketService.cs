@@ -2,6 +2,7 @@ using TicketGo.Application.DTOs;
 using TicketGo.Domain.Entities;
 using TicketGo.Domain.Interfaces;
 using X.PagedList;
+using TicketGo.Application.Interfaces;
 
 namespace TicketGo.Application.Services
 {
@@ -92,7 +93,7 @@ namespace TicketGo.Application.Services
             return trains.Select(t => new TrainDto
             {
                 IdTrain = t.IdTrain,
-                TrainName = t.IdTrain.ToString() // Có thể thay bằng thuộc tính phù hợp của Train
+                NameTrain = t.NameTrain 
             }).ToList();
         }
     }

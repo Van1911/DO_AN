@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TicketGo.Application.Interfaces;
 using TicketGo.Application.DTOs;
+using TicketGo.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TicketGo.Web.Controllers
 {
@@ -20,7 +22,7 @@ namespace TicketGo.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register(RegisterDto registerDto)
+        public async Task<IActionResult> Register(AccountDto registerDto)
         {
             if (ModelState.IsValid)
             {

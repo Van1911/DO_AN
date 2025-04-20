@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using TicketGo.Application.Interfaces;
 using TicketGo.Application.DTOs;
-
+using Microsoft.AspNetCore.Authorization;
 namespace TicketGo.Web.Areas.Admin.Controllers
 {   
     [Authorize(Roles = "Admin")]
@@ -10,9 +10,11 @@ namespace TicketGo.Web.Areas.Admin.Controllers
     public class OrdersController : Controller
     {
         private readonly IOrderService _orderService;
+        private readonly IDiscountService _discountService;
 
-        public OrdersController(IOrderService orderService)
+        public OrdersController(IOrderService orderService, IDiscountService discountService)
         {
+            _discountService = discountService;
             _orderService = orderService;
         }
 
@@ -44,7 +46,7 @@ namespace TicketGo.Web.Areas.Admin.Controllers
         public async Task<IActionResult> Create()
         {
             var customers = await _orderService.GetAllCustomersAsync();
-            var discounts = await _orderService.GetAllDiscountsAsync();
+            var discounts = await _discountService.GetAllDiscountsAsync();
 
             ViewData["IdCus"] = new SelectList(customers, "IdCus", "CustomerName");
             ViewData["IdDiscount"] = new SelectList(discounts, "IdDiscount", "DiscountName");
@@ -63,7 +65,7 @@ namespace TicketGo.Web.Areas.Admin.Controllers
             }
 
             var customers = await _orderService.GetAllCustomersAsync();
-            var discounts = await _orderService.GetAllDiscountsAsync();
+            var discounts = await _discountService.GetAllDiscountsAsync();
 
             ViewData["IdCus"] = new SelectList(customers, "IdCus", "CustomerName", orderDto.IdCus);
             ViewData["IdDiscount"] = new SelectList(discounts, "IdDiscount", "DiscountName", orderDto.IdDiscount);
@@ -85,7 +87,7 @@ namespace TicketGo.Web.Areas.Admin.Controllers
             }
 
             var customers = await _orderService.GetAllCustomersAsync();
-            var discounts = await _orderService.GetAllDiscountsAsync();
+            var discounts = await _discountService.GetAllDiscountsAsync();
 
             ViewData["IdCus"] = new SelectList(customers, "IdCus", "CustomerName", order.IdCus);
             ViewData["IdDiscount"] = new SelectList(discounts, "IdDiscount", "DiscountName", order.IdDiscount);
@@ -93,7 +95,7 @@ namespace TicketGo.Web.Areas.Admin.Controllers
             var orderDto = new CreateUpdateOrderDto
             {
                 IdOrder = order.IdOrder,
-                UnitPrice = order.UnitPrice,
+                TotalPrice = order.TotalPrice,
                 DateOrder = order.DateOrder,
                 IdTicket = order.IdTicket,
                 IdDiscount = order.IdDiscount,
@@ -123,7 +125,7 @@ namespace TicketGo.Web.Areas.Admin.Controllers
                 }
                 catch (Exception)
                 {
-                    if (!await _orderService.GetOrderByIdAsync(id) != null)
+                    if (await _orderService.GetOrderByIdAsync(id) != null)
                     {
                         return NotFound();
                     }
@@ -133,7 +135,7 @@ namespace TicketGo.Web.Areas.Admin.Controllers
             }
 
             var customers = await _orderService.GetAllCustomersAsync();
-            var discounts = await _orderService.GetAllDiscountsAsync();
+            var discounts = await _discountService.GetAllDiscountsAsync();
 
             ViewData["IdCus"] = new SelectList(customers, "IdCus", "CustomerName", orderDto.IdCus);
             ViewData["IdDiscount"] = new SelectList(discounts, "IdDiscount", "DiscountName", orderDto.IdDiscount);

@@ -1,4 +1,4 @@
-﻿namespace DO_AN.ViewModel.Paging
+﻿namespace TicketGo.Application.DTOs.Paging
 {
     public class PagingSearch
     {

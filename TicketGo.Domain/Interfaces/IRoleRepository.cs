@@ -1,5 +1,8 @@
-namespace TicketGo.Domain.Interfaces{
-    public interface IRoleRepository : IRepository<Role>
+using TicketGo.Domain.Entities;
+
+namespace TicketGo.Domain.Interfaces
+{
+    public interface IRoleRepository 
     {
         Task<List<Role>> GetAllAsync();
         Task<Role> GetByIdAsync(int id);

@@ -1,11 +1,13 @@
+using TicketGo.Domain.Entities;
+
 namespace TicketGo.Domain.Interfaces
 {
-    public interface IDiscountRepository : IRepository<Discount>
+    public interface IDiscountRepository
     {
         Task<List<Discount>> GetAllAsync();
-        Task<Discount> GetByIdAsync(int id);
-        Task AddAsync(Discount discount);
-        Task UpdateAsync(Discount discount);
-        Task DeleteAsync(int id);
+        // Task<Discount> GetByIdAsync(int id);
+        // Task AddAsync(Discount discount);
+        // Task UpdateAsync(Discount discount);
+        // Task DeleteAsync(int id);
     }
 }

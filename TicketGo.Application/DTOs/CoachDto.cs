@@ -7,7 +7,7 @@ namespace TicketGo.Application.DTOs
         public string Category { get; set; }
         public int? SeatsQuantity { get; set; }
         public decimal? BasicPrice { get; set; }
-        public int IdTrain { get; set; }
+        public int? IdTrain { get; set; }
         public string TrainName { get; set; } // Tên tàu (từ IdTrainNavigation)
     }
     

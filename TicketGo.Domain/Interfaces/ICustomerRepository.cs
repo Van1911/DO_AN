@@ -1,12 +1,14 @@
+using TicketGo.Domain.Entities;
+
 namespace TicketGo.Domain.Interfaces
 {
-    public interface ICustomerRepository : IRepository<Customer>
+    public interface ICustomerRepository 
     {
-        Task<List<Coach>> GetAllAsync();
-        Task<bool> ExistsAsync(int id);
-        Task<Customer> GetByIdAsync(int id);
+        Task<List<Customer>> GetAllAsync();
+        // Task<bool> ExistsAsync(int id);
+        // Task<Customer> GetByIdAsync(int id);
         Task AddAsync(Customer customer);
-        Task UpdateAsync(Customer customer);
-        Task DeleteAsync(int id);
+        // Task UpdateAsync(Customer customer);
+        // Task DeleteAsync(int id);
     }
 }

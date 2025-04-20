@@ -1,59 +1,48 @@
 using Microsoft.EntityFrameworkCore;
 using TicketGo.Domain.Entities;
 using TicketGo.Domain.Interfaces;
+using TicketGo.Infrastructure.Data;
 
 namespace TicketGo.Infrastructure.Repositories
 {
-    public class OrderRepository : IOrderRepository
+    public class OrderTicketRepository : IOrderTicketRepository
     {
         private readonly AppDbContext _context;
 
-        public OrderRepository(AppDbContext context)
+        public OrderTicketRepository(AppDbContext context)
         {
             _context = context;
         }
 
-        public async Task<List<Order>> GetAllAsync()
+        public async Task<OrderTicket> GetByIdAsync(int id)
         {
-            return await _context.Orders
-                .Include(o => o.IdCusNavigation)
-                .Include(o => o.IdDiscountNavigation)
-                .ToListAsync();
+            return await _context.OrderTickets
+                .Include(ot => ot.IdOrderNavigation)
+                .Include(ot => ot.IdTicketNavigation)
+                .FirstOrDefaultAsync(ot => ot.IdOrder == id);
         }
 
-        public async Task<Order> GetByIdAsync(int id)
+        public async Task AddAsync(OrderTicket orderTicket)
         {
-            return await _context.Orders
-                .Include(o => o.IdCusNavigation)
-                .Include(o => o.IdDiscountNavigation)
-                .FirstOrDefaultAsync(o => o.IdOrder == id);
-        }
-
-        public async Task AddAsync(Order order)
-        {
-            await _context.Orders.AddAsync(order);
+            await _context.OrderTickets.AddAsync(orderTicket);
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateAsync(Order order)
+        public async Task UpdateAsync(OrderTicket orderTicket)
         {
-            _context.Orders.Update(order);
+            _context.OrderTickets.Update(orderTicket);
             await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(int id)
         {
-            var order = await _context.Orders.FindAsync(id);
-            if (order != null)
+            var orderTicket = await _context.OrderTickets
+                .FirstOrDefaultAsync(ot => ot.IdOrder == id);
+            if (orderTicket != null)
             {
-                _context.Orders.Remove(order);
+                _context.OrderTickets.Remove(orderTicket);
                 await _context.SaveChangesAsync();
             }
-        }
-
-        public async Task<bool> ExistsAsync(int id)
-        {
-            return await _context.Orders.AnyAsync(o => o.IdOrder == id);
         }
     }
 }

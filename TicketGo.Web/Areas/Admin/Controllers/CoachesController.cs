@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using TicketGo.Application.Interfaces;
 using TicketGo.Application.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TicketGo.Web.Areas.Admin.Controllers
 {   
@@ -88,7 +89,7 @@ namespace TicketGo.Web.Areas.Admin.Controllers
                 Category = coach.Category,
                 SeatsQuantity = coach.SeatsQuantity,
                 BasicPrice = coach.BasicPrice,
-                IdTrain = coach.IdTrain
+                IdTrain = coach.IdTrain.Value
             };
 
             return View(coachDto);
@@ -112,7 +113,7 @@ namespace TicketGo.Web.Areas.Admin.Controllers
                 }
                 catch (Exception)
                 {
-                    if (!await _coachService.GetCoachByIdAsync(id) != null)
+                    if (await _coachService.GetCoachByIdAsync(id) != null)
                     {
                         return NotFound();
                     }

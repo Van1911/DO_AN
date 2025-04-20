@@ -1,6 +1,9 @@
 using TicketGo.Application.DTOs;
 using TicketGo.Domain.Entities;
 using TicketGo.Domain.Interfaces;
+using TicketGo.Application.Interfaces;
+using Microsoft.AspNetCore.Http;
+
 
 namespace TicketGo.Application.Services
 {
@@ -17,10 +20,10 @@ namespace TicketGo.Application.Services
             _roleRepository = roleRepository;
         }
 
-        public async Task<bool> RegisterAsync(RegisterDto registerDto)
+        public async Task<bool> RegisterAsync(AccountDto registerDto)
         {
             // Tạo tài khoản mới
-            var newAccount = new Account
+            var newAccount = new Account // Changed from AccountDto to Account
             {
                 Email = registerDto.Email,
                 Password = registerDto.Password,
@@ -38,7 +41,7 @@ namespace TicketGo.Application.Services
             {
                 IdCus = newAccount.IdAccount,
                 IdAccount = newAccount.IdAccount,
-                FullName = registerDto.FullName
+                // FullName = newAccount.FullName
             };
 
             // Lưu khách hàng
@@ -102,7 +105,7 @@ namespace TicketGo.Application.Services
                 Sex = a.Sex,
                 DateOfBirth = a.DateOfBirth,
                 IdRole = a.IdRole,
-                RoleName = a.IdRoleNavigation?.RoleName
+                RoleName = a.IdRoleNavigation?.Name
             }).ToList();
         }
 
@@ -117,13 +120,14 @@ namespace TicketGo.Application.Services
             return new AccountDto
             {
                 IdAccount = account.IdAccount,
+                // Fullname = account.FullName,
                 Phone = account.Phone,
                 Email = account.Email,
                 Password = account.Password,
                 Sex = account.Sex,
                 DateOfBirth = account.DateOfBirth,
                 IdRole = account.IdRole,
-                RoleName = account.IdRoleNavigation?.RoleName
+                RoleName = account.IdRoleNavigation?.Name
             };
         }
 
@@ -171,7 +175,7 @@ namespace TicketGo.Application.Services
             return roles.Select(r => new RoleDto
             {
                 IdRole = r.IdRole,
-                RoleName = r.RoleName
+                RoleName = r.Name
             }).ToList();
         }
     }

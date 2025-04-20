@@ -1,4 +1,6 @@
-﻿namespace TicketGo.Application.DTOs
+﻿using TicketGo.Domain.Entities;
+
+namespace TicketGo.Application.DTOs
 {
     public class OrderTicketDto
     {

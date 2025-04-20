@@ -1,6 +1,7 @@
 using TicketGo.Application.DTOs;
 using TicketGo.Domain.Entities;
 using TicketGo.Domain.Interfaces;
+using TicketGo.Application.Interfaces;
 
 namespace TicketGo.Application.Services
 {
@@ -24,7 +25,7 @@ namespace TicketGo.Application.Services
                 NameCoach = c.NameCoach,
                 Category = c.Category,
                 SeatsQuantity = c.SeatsQuantity,
-                BasicPrice = c.BasicPrice,
+                BasicPrice = (decimal?)c.BasicPrice,
                 IdTrain = c.IdTrain,
                 TrainName = c.IdTrainNavigation?.IdTrain.ToString() // Có thể thay bằng thuộc tính phù hợp của Train
             }).ToList();
@@ -44,7 +45,7 @@ namespace TicketGo.Application.Services
                 NameCoach = coach.NameCoach,
                 Category = coach.Category,
                 SeatsQuantity = coach.SeatsQuantity,
-                BasicPrice = coach.BasicPrice,
+                BasicPrice = (decimal?)coach.BasicPrice,
                 IdTrain = coach.IdTrain,
                 TrainName = coach.IdTrainNavigation?.IdTrain.ToString() // Có thể thay bằng thuộc tính phù hợp của Train
             };
@@ -57,7 +58,7 @@ namespace TicketGo.Application.Services
                 NameCoach = coachDto.NameCoach,
                 Category = coachDto.Category,
                 SeatsQuantity = coachDto.SeatsQuantity,
-                BasicPrice = coachDto.BasicPrice,
+                BasicPrice = (double?)coachDto.BasicPrice,
                 IdTrain = coachDto.IdTrain
             };
 
@@ -75,7 +76,7 @@ namespace TicketGo.Application.Services
             coach.NameCoach = coachDto.NameCoach;
             coach.Category = coachDto.Category;
             coach.SeatsQuantity = coachDto.SeatsQuantity;
-            coach.BasicPrice = coachDto.BasicPrice;
+            coach.BasicPrice = (double?)coachDto.BasicPrice;
             coach.IdTrain = coachDto.IdTrain;
 
             await _coachRepository.UpdateAsync(coach);
@@ -86,13 +87,13 @@ namespace TicketGo.Application.Services
             await _coachRepository.DeleteAsync(id);
         }
 
-        public async Task<List<TrainDto>> GetAllTrainsAsync()
+       public async Task<List<TrainDto>> GetAllTrainsAsync()
         {
             var trains = await _trainRepository.GetAllAsync();
             return trains.Select(t => new TrainDto
             {
                 IdTrain = t.IdTrain,
-                TrainName = t.IdTrain.ToString() // Có thể thay bằng thuộc tính phù hợp của Train
+                NameTrain = t.NameTrain
             }).ToList();
         }
     }

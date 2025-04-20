@@ -1,6 +1,5 @@
-﻿using DO_AN.ViewModel;
-
-namespace DO_AN.Services
+﻿
+namespace TicketGo.Application.Interfaces
 {
 
     public interface IEmailSender

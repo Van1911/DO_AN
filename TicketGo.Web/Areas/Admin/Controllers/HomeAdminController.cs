@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using TicketGo.Application.Interfaces;
 using TicketGo.Application.DTOs;
 using X.PagedList;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TicketGo.Web.Areas.Admin.Controllers
 {
@@ -82,7 +83,7 @@ namespace TicketGo.Web.Areas.Admin.Controllers
                 }
                 catch (Exception)
                 {
-                    if (!await _ticketService.GetTicketByIdAsync(id) != null)
+                    if (await _ticketService.GetTicketByIdAsync(id) != null)
                     {
                         return NotFound();
                     }

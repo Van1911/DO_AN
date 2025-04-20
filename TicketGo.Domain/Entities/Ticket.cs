@@ -16,7 +16,7 @@ namespace TicketGo.Domain.Entities
         public int IdSeat { get; set; } 
         public int IdTrain { get; set; }
 
-        public virtual Seat IdSeatNavigation { get; set; } 
+        public virtual Seat IdSeatNavigation { get; set; }  = null!;
         public virtual Train IdTrainNavigation { get; set; }
         public virtual ICollection<OrderTicket> OrderTickets { get; set; }
     }

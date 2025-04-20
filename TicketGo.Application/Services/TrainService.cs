@@ -1,6 +1,7 @@
 using TicketGo.Application.DTOs;
 using TicketGo.Domain.Entities;
 using TicketGo.Domain.Interfaces;
+using TicketGo.Application.Interfaces;
 
 namespace TicketGo.Application.Services
 {
@@ -55,7 +56,7 @@ namespace TicketGo.Application.Services
                 TrainRouteName = t.IdTrainRouteNavigation != null 
                     ? $"{t.IdTrainRouteNavigation.PointStart} - {t.IdTrainRouteNavigation.PointEnd}" 
                     : null,
-                CoefficientTrain = t.CoefficientTrain
+                CoefficientTrain = (double?)t.CoefficientTrain
             }).ToList();
         }
 
@@ -76,7 +77,7 @@ namespace TicketGo.Application.Services
                 TrainRouteName = train.IdTrainRouteNavigation != null 
                     ? $"{train.IdTrainRouteNavigation.PointStart} - {train.IdTrainRouteNavigation.PointEnd}" 
                     : null,
-                CoefficientTrain = train.CoefficientTrain
+                CoefficientTrain =  (double?)train.CoefficientTrain
             };
         }
 
@@ -87,7 +88,7 @@ namespace TicketGo.Application.Services
                 NameTrain = trainDto.NameTrain,
                 DateStart = trainDto.DateStart,
                 IdTrainRoute = trainDto.IdTrainRoute,
-                CoefficientTrain = trainDto.CoefficientTrain
+                CoefficientTrain =  (decimal?)trainDto.CoefficientTrain
             };
 
             await _trainRepository.AddAsync(train);
@@ -104,7 +105,7 @@ namespace TicketGo.Application.Services
             train.NameTrain = trainDto.NameTrain;
             train.DateStart = trainDto.DateStart;
             train.IdTrainRoute = trainDto.IdTrainRoute;
-            train.CoefficientTrain = trainDto.CoefficientTrain;
+            train.CoefficientTrain =  (decimal?)trainDto.CoefficientTrain;
 
             await _trainRepository.UpdateAsync(train);
         }

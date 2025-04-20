@@ -1,6 +1,9 @@
+using TicketGo.Domain.Entities;
+using X.PagedList;
+
 namespace TicketGo.Domain.Interfaces
 {
-    public interface ITicketRepository : IRepository<Ticket>
+    public interface ITicketRepository 
     {
         Task<IPagedList<Ticket>> GetPagedTicketsAsync(int pageNumber, int pageSize);
         Task<Ticket> GetByIdAsync(int id);

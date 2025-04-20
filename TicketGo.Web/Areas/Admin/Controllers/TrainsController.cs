@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using TicketGo.Application.Interfaces;
 using TicketGo.Application.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TicketGo.Web.Areas.Admin.Controllers
 {   
@@ -111,7 +112,7 @@ namespace TicketGo.Web.Areas.Admin.Controllers
                 }
                 catch (Exception)
                 {
-                    if (!await _trainService.GetTrainByIdAsync(id) != null)
+                    if (await _trainService.GetTrainByIdAsync(id) != null)
                     {
                         return NotFound();
                     }

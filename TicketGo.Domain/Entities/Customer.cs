@@ -11,7 +11,7 @@ namespace TicketGo.Domain.Entities
         }
 
         public int IdCus { get; set; }
-        public string? FullName { get; set; }
+        public string? FullName { get; set; }= null!;
         public int IdAccount { get; set; }
 
         public virtual Account IdAccountNavigation { get; set; } = null!;

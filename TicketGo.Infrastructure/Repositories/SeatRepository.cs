@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using TicketGo.Domain.Entities;
 using TicketGo.Domain.Interfaces;
+using TicketGo.Infrastructure.Data;
 
 namespace TicketGo.Infrastructure.Repositories
 {
@@ -12,21 +13,95 @@ namespace TicketGo.Infrastructure.Repositories
         {
             _context = context;
         }
-        
+
         public async Task<List<Seat>> GetAllAsync()
         {
-            return await _context.Seats.ToListAsync();
+            return await _context.Seats
+                .Include(s => s.IdCoachNavigation)
+                .Include(s => s.Tickets)
+                .ToListAsync();
         }
 
         public async Task<Seat> GetByNameAndCoachIdAsync(string nameSeat, int idCoach)
         {
-            return await _context.Seats
+            if (string.IsNullOrWhiteSpace(nameSeat))
+            {
+                throw new ArgumentException("Seat name cannot be null or empty.");
+            }
+
+            var seat = await _context.Seats
+                .Include(s => s.IdCoachNavigation)
+                .Include(s => s.Tickets)
                 .FirstOrDefaultAsync(s => s.NameSeat == nameSeat && s.IdCoach == idCoach);
+
+            if (seat == null)
+            {
+                throw new KeyNotFoundException($"Seat with name '{nameSeat}' and Coach ID {idCoach} not found.");
+            }
+
+            return seat;
+        }
+
+        public async Task<Seat> GetByIdAsync(int id)
+        {
+            var seat = await _context.Seats
+                .Include(s => s.IdCoachNavigation)
+                .Include(s => s.Tickets)
+                .FirstOrDefaultAsync(s => s.IdSeat == id);
+
+            if (seat == null)
+            {
+                throw new KeyNotFoundException($"Seat with ID {id} not found.");
+            }
+
+            return seat;
+        }
+
+        public async Task AddAsync(Seat seat)
+        {
+            if (seat == null || string.IsNullOrWhiteSpace(seat.NameSeat))
+            {
+                throw new ArgumentException("Seat cannot be null and must have a valid name.");
+            }
+
+            await _context.Seats.AddAsync(seat);
+            await _context.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(Seat seat)
         {
-            _context.Seats.Update(seat);
+            if (seat == null || string.IsNullOrWhiteSpace(seat.NameSeat))
+            {
+                throw new ArgumentException("Seat cannot be null and must have a valid name.");
+            }
+
+            var existingSeat = await _context.Seats.FindAsync(seat.IdSeat);
+            if (existingSeat == null)
+            {
+                throw new KeyNotFoundException($"Seat with ID {seat.IdSeat} not found.");
+            }
+
+            _context.Entry(existingSeat).CurrentValues.SetValues(seat);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            var seat = await _context.Seats
+                .Include(s => s.Tickets)
+                .FirstOrDefaultAsync(s => s.IdSeat == id);
+
+            if (seat == null)
+            {
+                throw new KeyNotFoundException($"Seat with ID {id} not found.");
+            }
+
+            if (seat.Tickets.Any())
+            {
+                throw new InvalidOperationException($"Cannot delete seat with ID {id} because it is associated with one or more tickets.");
+            }
+
+            _context.Seats.Remove(seat);
             await _context.SaveChangesAsync();
         }
     }

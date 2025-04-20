@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TicketGo.Application.Interfaces;
 using TicketGo.Application.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TicketGo.Web.Controllers
 {

@@ -1,6 +1,7 @@
 using TicketGo.Application.DTOs;
 using TicketGo.Domain.Entities;
 using TicketGo.Domain.Interfaces;
+using TicketGo.Application.Interfaces;
 
 namespace TicketGo.Application.Services
 {
@@ -31,23 +32,25 @@ namespace TicketGo.Application.Services
             _customerRepository = customerRepository;
             _discountRepository = discountRepository;
         }
+
         public async Task<List<OrderDto>> GetAllOrdersAsync()
         {
             var orders = await _orderRepository.GetAllAsync();
             return orders.Select(o => new OrderDto
             {
                 IdOrder = o.IdOrder,
-                UnitPrice = o.UnitPrice,
+                TotalPrice = o.UnitPrice, // Đồng bộ với tên TotalPrice
                 DateOrder = o.DateOrder,
                 IdTicket = o.IdTicket,
                 IdDiscount = o.IdDiscount,
-                DiscountName = o.IdDiscountNavigation?.IdDiscount.ToString(), // Có thể thay bằng thuộc tính phù hợp của Discount
+                DiscountName = o.IdDiscountNavigation?.IdDiscount.ToString(),
                 NameCus = o.NameCus,
                 Phone = o.Phone,
                 IdCus = o.IdCus,
-                CustomerName = o.IdCusNavigation?.IdCus.ToString() // Có thể thay bằng thuộc tính phù hợp của Customer
+                CustomerName = o.IdCusNavigation?.FullName
             }).ToList();
         }
+
         public async Task<OrderDto> GetOrderByIdAsync(int id)
         {
             var order = await _orderRepository.GetByIdAsync(id);
@@ -59,17 +62,18 @@ namespace TicketGo.Application.Services
             return new OrderDto
             {
                 IdOrder = order.IdOrder,
-                UnitPrice = order.UnitPrice,
+                TotalPrice = order.UnitPrice,
                 DateOrder = order.DateOrder,
                 IdTicket = order.IdTicket,
                 IdDiscount = order.IdDiscount,
-                DiscountName = order.IdDiscountNavigation?.IdDiscount.ToString(), // Có thể thay bằng thuộc tính phù hợp của Discount
+                DiscountName = order.IdDiscountNavigation?.IdDiscount.ToString(),
                 NameCus = order.NameCus,
                 Phone = order.Phone,
                 IdCus = order.IdCus,
-                CustomerName = order.IdCusNavigation?.IdCus.ToString() // Có thể thay bằng thuộc tính phù hợp của Customer
+                CustomerName = order.IdCusNavigation?.FullName
             };
         }
+
         public async Task<OrderTicketDto> GetOrderTicketDetailsAsync(int idCoach)
         {
             var coach = await _coachRepository.GetCoachWithRelatedDataAsync(idCoach);
@@ -85,42 +89,44 @@ namespace TicketGo.Application.Services
             return CreateOrderTicketDto(coach, occupiedSeats, coachCategory, ticketPrice);
         }
 
-        public async Task CreateOrderAsync(CreateOrderDto createOrderDto)
+        public async Task CreateOrderAsync(CreateUpdateOrderDto orderDto)
         {
-            // Tạo đơn hàng
             var order = new Order
             {
-                UnitPrice = (double)createOrderDto.TotalPrice,
-                DateOrder = DateTime.Now,
-                NameCus = createOrderDto.Fullname,
-                Phone = createOrderDto.Phone,
-                IdCus = createOrderDto.IdCustomer
+                UnitPrice = orderDto.TotalPrice ?? 0,
+                DateOrder = orderDto.DateOrder ?? DateTime.Now,
+                NameCus = orderDto.NameCus,
+                Phone = orderDto.Phone,
+                IdCus = orderDto.IdCus,
+                IdDiscount = orderDto.IdDiscount ?? 0
             };
 
             await _orderRepository.AddAsync(order);
 
-            // Xử lý từng ghế
-            foreach (var seatName in createOrderDto.ListSeats)
+            foreach (var seatName in orderDto.ListSeats)
             {
-                var seat = await _seatRepository.GetByNameAndCoachIdAsync(seatName, createOrderDto.IdCoach);
+                if (orderDto.IdCoach == null)
+                    throw new ArgumentException("IdCoach is required");
+
+                var seat = await _seatRepository.GetByNameAndCoachIdAsync(seatName, orderDto.IdCoach.Value);
+
+    
                 if (seat != null)
                 {
-                    // Cập nhật trạng thái ghế
                     seat.State = true;
                     await _seatRepository.UpdateAsync(seat);
+                    var coach = await _coachRepository.GetCoachWithRelatedDataAsync(seat.IdCoach.Value);
 
-                    // Tạo vé
                     var ticket = new Ticket
                     {
                         Date = DateTime.Now,
-                        Price = (double)createOrderDto.TotalPrice,
+                        Price = orderDto.TotalPrice ?? 0,
                         IdSeat = seat.IdSeat,
-                        IdTrain = (int)_coachRepository.GetCoachWithRelatedDataAsync(seat.IdCoach).Result.IdTrain
+                        IdTrain = (int)coach.IdTrain
                     };
 
                     await _ticketRepository.AddAsync(ticket);
 
-                    // Tạo mối quan hệ đơn hàng - vé
                     var orderTicket = new OrderTicket
                     {
                         IdOrder = order.IdOrder,
@@ -153,21 +159,22 @@ namespace TicketGo.Application.Services
                 VehicleType = coachCategory
             };
         }
+
         public async Task UpdateOrderAsync(int id, CreateUpdateOrderDto orderDto)
         {
             var order = await _orderRepository.GetByIdAsync(id);
             if (order == null)
             {
-                throw new Exception("Order not found");
+                throw new Exception("Đơn hàng không tồn tại");
             }
 
-            order.UnitPrice = orderDto.UnitPrice;
-            order.DateOrder = orderDto.DateOrder;
-            order.IdTicket = orderDto.IdTicket;
-            order.IdDiscount = orderDto.IdDiscount;
+            order.UnitPrice = orderDto.TotalPrice ?? 0;
+            order.DateOrder = orderDto.DateOrder ?? DateTime.Now;
+            order.IdTicket = orderDto.IdTicket ?? 0;
+            order.IdDiscount = orderDto.IdDiscount ?? 0;
             order.NameCus = orderDto.NameCus;
             order.Phone = orderDto.Phone;
-            order.IdCus = orderDto.IdCus;
+            order.IdCus = orderDto.IdCus ?? 0; // Sử dụng orderDto, không phải Coach
 
             await _orderRepository.UpdateAsync(order);
         }
@@ -183,10 +190,8 @@ namespace TicketGo.Application.Services
             return customers.Select(c => new CustomerDto
             {
                 IdCus = c.IdCus,
-                CustomerName = c.IdCus.ToString() // Có thể thay bằng thuộc tính phù hợp của Customer
+                CustomerName = c.FullName
             }).ToList();
         }
-
-       
     }
 }

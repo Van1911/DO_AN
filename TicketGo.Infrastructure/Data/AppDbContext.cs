@@ -1,14 +1,12 @@
-﻿using System;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using TicketGo.Domain.Entities; 
 
 
 namespace TicketGo.Infrastructure.Data
 {
     public partial class AppDbContext : DbContext
     {
-        public AppDbContext(DbContextOptions<DOANContext> options): base(options)
+        public AppDbContext(DbContextOptions<AppDbContext> options): base(options)
         {
         }
 
@@ -36,19 +34,19 @@ namespace TicketGo.Infrastructure.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configure IdentityUserLogin<string>
-            modelBuilder.Entity<IdentityUserLogin<string>>(entity =>
-            {
-                entity.HasKey(e => new { e.LoginProvider, e.ProviderKey });
-                entity.ToTable("AspNetUserLogins"); // Specify the table name if needed
-            });
+            // // Configure IdentityUserLogin<string>
+            // modelBuilder.Entity<IdentityUserLogin<string>>(entity =>
+            // {
+            //     entity.HasKey(e => new { e.LoginProvider, e.ProviderKey });
+            //     entity.ToTable("AspNetUserLogins"); // Specify the table name if needed
+            // });
 
-            // Configure IdentityUserRole<string>
-            modelBuilder.Entity<IdentityUserRole<string>>(entity =>
-            {
-                entity.HasKey(e => new { e.UserId, e.RoleId });
-                entity.ToTable("AspNetUserRoles"); // Specify the table name if needed
-            });
+            // // Configure IdentityUserRole<string>
+            // modelBuilder.Entity<IdentityUserRole<string>>(entity =>
+            // {
+            //     entity.HasKey(e => new { e.UserId, e.RoleId });
+            //     entity.ToTable("AspNetUserRoles"); // Specify the table name if needed
+            // });
 
             modelBuilder.Entity<Account>(entity =>
             {
@@ -211,9 +209,9 @@ namespace TicketGo.Infrastructure.Data
 
                 entity.Property(e => e.IdRole).HasColumnName("ID_Role");
 
-                entity.Property(e => e.NameRole)
+                entity.Property(e => e.Name)
                     .HasMaxLength(50)
-                    .HasColumnName("Name_Role");
+                    .HasColumnName("Name");
             });
 
             modelBuilder.Entity<Seat>(entity =>

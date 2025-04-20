@@ -12,8 +12,8 @@ namespace TicketGo.Domain.Entities
        
 
         public int IdTrainRoute { get; set; }
-        public string PointStart { get; set; }
-        public string PointEnd { get; set; }
+        public string PointStart { get; set; } = null!;
+        public string PointEnd { get; set; } = null!;
 
         public virtual ICollection<Train> Trains { get; set; }
     }

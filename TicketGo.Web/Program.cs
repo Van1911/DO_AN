@@ -1,31 +1,32 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using TicketGo.Application.Interfaces;
 using TicketGo.Application.Services;
 using TicketGo.Domain.Interfaces;
 using TicketGo.Infrastructure.Data;
 using TicketGo.Infrastructure.Repositories;
-using TicketGo.Infrastructure.Services;
+
 using TicketGo.Web.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews(); // Sử dụng MVC thay vì Razor Pages
+builder.Services.AddControllersWithViews();
 
-// Cấu hình DbContext với SQL Server
+// Configure DbContext with SQL Server
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Cấu hình session
+// Configure session
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(30); // Thời gian timeout của session
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
 
-// Đăng ký các repository
+// Register repositories
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ITicketRepository, TicketRepository>();
@@ -37,9 +38,8 @@ builder.Services.AddScoped<IOrderTicketRepository, OrderTicketRepository>();
 builder.Services.AddScoped<ITrainRouteRepository, TrainRouteRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IDiscountRepository, DiscountRepository>();
-// Đăng ký các repository khác nếu cần...
 
-// Đăng ký các service
+// Register services
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ITicketService, TicketService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
@@ -47,15 +47,12 @@ builder.Services.AddScoped<ITrainService, TrainService>();
 builder.Services.AddScoped<ICoachService, CoachService>();
 builder.Services.AddScoped<ITrainRouteService, TrainRouteService>();
 
-// Đăng ký các service khác nếu cần...
-
-// Đăng ký dịch vụ gửi email
-builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
-builder.Services.AddScoped<IMailSettings, MailSettings>();
+// Configure email settings
+// builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 builder.Services.AddScoped<IEmailSender, EmailSender>();
 
-// Đăng ký dịch vụ thanh toán VnPay
-builder.Services.AddScoped<IVnPayService, VnPayService>();
+// Register VnPay service
+builder.Services.AddScoped<IVNPayService, VNPayService>();
 
 var app = builder.Build();
 
@@ -66,23 +63,22 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
-    app.UseErrorHandling(); // Sử dụng middleware xử lý lỗi
+    app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
-
-app.UseCustomLogging(); // Sử dụng middleware ghi log
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+// Chuyển hướng đến middleware xử lý lỗi 404
+app.UseStatusCodePagesWithReExecute("/Error/{0}");
 
-app.UseSession(); // Thêm middleware session
-
+app.UseSession();
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=TrangChu}/{id?}");
 
 app.Run();

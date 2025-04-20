@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using TicketGo.Application.Services; 
 using TicketGo.Application.Interfaces;
 using TicketGo.Application.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TicketGo.Web.Controllers
 {
@@ -10,9 +12,9 @@ namespace TicketGo.Web.Controllers
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IOrderService _orderService;
-        private readonly IVnPayService _vnPayService;
+        private readonly IVNPayService _vnPayService;
 
-        public OrderController(IOrderService orderService, IVnPayService vnPayService, IHttpContextAccessor httpContext)
+        public OrderController(IOrderService orderService, IVNPayService vnPayService, IHttpContextAccessor httpContext)
         {
             _httpContextAccessor = httpContext;
             _orderService = orderService;
@@ -116,15 +118,14 @@ namespace TicketGo.Web.Controllers
             string listSeatsFinal = listSeats.First();
             List<string> seats = JsonConvert.DeserializeObject<List<string>>(listSeatsFinal);
 
-            var createOrderDto = new CreateOrderDto
+            var createOrderDto = new CreateUpdateOrderDto
             {
                 ListSeats = seats,
-                Fullname = fullname,
+                NameCus = fullname,
                 Phone = phone,
-                Email = email,
-                TotalPrice = totalPrice,
+                TotalPrice = (double)totalPrice,
                 IdCoach = idCoach ?? 0,
-                IdCustomer = idCustomer ?? 0
+                IdCus = idCustomer ?? 0
             };
 
             await _orderService.CreateOrderAsync(createOrderDto);

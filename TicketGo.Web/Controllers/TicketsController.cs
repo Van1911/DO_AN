@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
-namespace DO_AN.Controllers
+namespace TicketGo.Web.Controllers
 {
     public class TicketsController : Controller
     {

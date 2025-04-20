@@ -1,6 +1,8 @@
+using TicketGo.Domain.Entities;
+
 namespace TicketGo.Domain.Interfaces
 {
-    public interface ISeatRepository : IRepository<Seat>
+    public interface ISeatRepository 
     {
         Task<List<Seat>> GetAllAsync();
         Task<Seat> GetByNameAndCoachIdAsync(string nameSeat, int idCoach);

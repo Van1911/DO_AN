@@ -1,6 +1,8 @@
+using TicketGo.Domain.Entities;
+
 namespace TicketGo.Domain.Interfaces
 {
-    public interface ITrainRepository : IRepository<Train>
+    public interface ITrainRepository 
     {
         Task<List<Train>> GetAllAsync();
         Task<List<Train>> SearchTrainsAsync(string pointStart, string pointEnd, DateTime? departureDate, int page, int pageSize);

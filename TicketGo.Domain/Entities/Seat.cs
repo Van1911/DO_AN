@@ -11,11 +11,11 @@ namespace TicketGo.Domain.Entities
         }
 
         public int IdSeat { get; set; }
-        public string? NameSeat { get; set; }
+        public string? NameSeat { get; set; } = null!;
         public bool State { get; set; }
         public int? IdCoach { get; set; }
 
-        public virtual Coach? IdCoachNavigation { get; set; }
+        public virtual Coach? IdCoachNavigation { get; set; }= null!;
         public virtual ICollection<Ticket> Tickets { get; set; }
     }
 }

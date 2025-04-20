@@ -1,6 +1,8 @@
+using TicketGo.Domain.Entities;
+
 namespace TicketGo.Domain.Interfaces
 {
-    public interface ITrainRouteRepository : IRepository<TrainRoute>
+    public interface ITrainRouteRepository 
     {
         Task<List<string>> GetStartPointsAsync(string term);
         Task<List<string>> GetEndPointsAsync(string term);

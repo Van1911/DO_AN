@@ -1,5 +1,7 @@
 using TicketGo.Domain.Entities;
+using Microsoft.EntityFrameworkCore; 
 using TicketGo.Domain.Interfaces;
+using TicketGo.Infrastructure.Data;
 
 namespace TicketGo.Infrastructure.Repositories
 {

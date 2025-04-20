@@ -11,7 +11,7 @@ namespace TicketGo.Domain.Entities
         }
 
         public int IdRole { get; set; }
-        public string NameRole { get; set; } = null!;
+        public string Name { get; set; } = null!;
 
         public virtual ICollection<Account> Accounts { get; set; }
     }

@@ -1,9 +1,11 @@
 ﻿using System;
+using Microsoft.EntityFrameworkCore; 
 using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 #nullable disable
 
-namespace DO_AN.Migrations
+namespace TicketGo.Infrastructure.Migrations
 {
     public partial class Init : Migration
     {

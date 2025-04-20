@@ -1,42 +1,45 @@
-﻿using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
+using TicketGo.Application.Interfaces;
 
-public class EmailSender : IEmailSender
+namespace TicketGo.Application.Services
 {
-    private readonly IConfiguration _configuration;
-
-    public EmailSender(IConfiguration configuration)
+    public class EmailSender : IEmailSender
     {
-        _configuration = configuration;
-    }
+        private readonly IConfiguration _configuration;
 
-    public Task SendEmailAsync(string email, string subject, string htmlMessage)
-    {
-        var smtpHost = _configuration["Smtp:Host"];
-        var smtpPort = int.Parse(_configuration["Smtp:Port"]);
-        var smtpUsername = _configuration["Smtp:Username"];
-        var smtpPassword = _configuration["Smtp:Password"];
-
-        using (var client = new SmtpClient(smtpHost, smtpPort))
+        public EmailSender(IConfiguration configuration)
         {
-            client.UseDefaultCredentials = false;
-            client.Credentials = new NetworkCredential(smtpUsername, smtpPassword);
-            client.EnableSsl = true;
+            _configuration = configuration;
+        }
 
-            var mailMessage = new MailMessage
+        public Task SendEmailAsync(string email, string subject, string htmlMessage)
+        {
+            var smtpHost = _configuration["Smtp:Host"];
+            var smtpPort = int.Parse(_configuration["Smtp:Port"]);
+            var smtpUsername = _configuration["Smtp:Username"];
+            var smtpPassword = _configuration["Smtp:Password"];
+
+            using (var client = new SmtpClient(smtpHost, smtpPort))
             {
-                From = new MailAddress(smtpUsername),
-                Subject = subject,
-                Body = htmlMessage,
-                IsBodyHtml = true
-            };
+                client.UseDefaultCredentials = false;
+                client.Credentials = new NetworkCredential(smtpUsername, smtpPassword);
+                client.EnableSsl = true;
 
-            mailMessage.To.Add(email);
+                var mailMessage = new MailMessage
+                {
+                    From = new MailAddress(smtpUsername),
+                    Subject = subject,
+                    Body = htmlMessage,
+                    IsBodyHtml = true
+                };
 
-            return client.SendMailAsync(mailMessage);
+                mailMessage.To.Add(email);
+
+                return client.SendMailAsync(mailMessage);
+            }
         }
     }
 }

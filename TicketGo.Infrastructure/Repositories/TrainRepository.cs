@@ -1,10 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using TicketGo.Domain.Entities;
 using TicketGo.Domain.Interfaces;
+using TicketGo.Infrastructure.Data;
 
 namespace TicketGo.Infrastructure.Repositories
 {
-    public class TrainRepository : ITrainRepository
+    public class TrainRepository :  ITrainRepository
     {
         private readonly AppDbContext _context;
 
