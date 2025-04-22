@@ -1,14 +1,14 @@
 ﻿using System;
-using Microsoft.EntityFrameworkCore; 
 using Microsoft.EntityFrameworkCore.Migrations;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 #nullable disable
 
 namespace TicketGo.Infrastructure.Migrations
 {
-    public partial class Init : Migration
+    /// <inheritdoc />
+    public partial class InitialCreate : Migration
     {
+        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -32,7 +32,7 @@ namespace TicketGo.Infrastructure.Migrations
                 {
                     ID_Role = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name_Role = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -64,8 +64,7 @@ namespace TicketGo.Infrastructure.Migrations
                     Password = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Sex = table.Column<bool>(type: "bit", nullable: true),
                     DateOfBirth = table.Column<DateTime>(type: "date", nullable: true),
-                    ID_Role = table.Column<int>(type: "int", nullable: false),
-                    StateAccount = table.Column<bool>(type: "bit", nullable: true)
+                    ID_Role = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -84,7 +83,7 @@ namespace TicketGo.Infrastructure.Migrations
                     ID_Train = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name_Train = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Date_Start = table.Column<DateTime>(type: "date", nullable: true),
+                    Date_Start = table.Column<DateTime>(type: "datetime", nullable: true),
                     ID_TrainRoute = table.Column<int>(type: "int", nullable: false),
                     CoefficientTrain = table.Column<decimal>(type: "decimal(14,4)", nullable: true)
                 },
@@ -146,7 +145,7 @@ namespace TicketGo.Infrastructure.Migrations
                     ID_Order = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Unit_Price = table.Column<double>(type: "float", nullable: true),
-                    Date_Order = table.Column<DateTime>(type: "date", nullable: true),
+                    Date_Order = table.Column<DateTime>(type: "datetime", nullable: true),
                     ID_Ticket = table.Column<int>(type: "int", nullable: false),
                     ID_Discount = table.Column<int>(type: "int", nullable: true),
                     NameCus = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
@@ -194,7 +193,7 @@ namespace TicketGo.Infrastructure.Migrations
                 {
                     ID_Ticket = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Date = table.Column<DateTime>(type: "date", nullable: true),
+                    Date = table.Column<DateTime>(type: "datetime", nullable: true),
                     Price = table.Column<double>(type: "float", nullable: true),
                     ID_Seat = table.Column<int>(type: "int", nullable: false),
                     ID_Train = table.Column<int>(type: "int", nullable: false)
@@ -294,6 +293,7 @@ namespace TicketGo.Infrastructure.Migrations
                 column: "ID_TrainRoute");
         }
 
+        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(

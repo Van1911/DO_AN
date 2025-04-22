@@ -11,25 +11,25 @@ using TicketGo.Infrastructure.Data;
 namespace TicketGo.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class DOANContextModelSnapshot : ModelSnapshot
+    partial class AppDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.0")
+                .HasAnnotation("ProductVersion", "8.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("DO_AN.Models.Account", b =>
+            modelBuilder.Entity("TicketGo.Domain.Entities.Account", b =>
                 {
                     b.Property<int>("IdAccount")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("ID_Account");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdAccount"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdAccount"));
 
                     b.Property<DateTime?>("DateOfBirth")
                         .HasColumnType("date");
@@ -55,9 +55,6 @@ namespace TicketGo.Infrastructure.Migrations
                     b.Property<bool?>("Sex")
                         .HasColumnType("bit");
 
-                    b.Property<bool?>("EmailConformed")
-                        .HasColumnType("bit");
-
                     b.HasKey("IdAccount");
 
                     b.HasIndex(new[] { "IdRole" }, "IX_Account_ID_Role");
@@ -65,14 +62,14 @@ namespace TicketGo.Infrastructure.Migrations
                     b.ToTable("Account", (string)null);
                 });
 
-            modelBuilder.Entity("DO_AN.Models.Coach", b =>
+            modelBuilder.Entity("TicketGo.Domain.Entities.Coach", b =>
                 {
                     b.Property<int>("IdCoach")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("ID_Coach");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdCoach"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdCoach"));
 
                     b.Property<double?>("BasicPrice")
                         .HasColumnType("float");
@@ -101,14 +98,14 @@ namespace TicketGo.Infrastructure.Migrations
                     b.ToTable("Coach", (string)null);
                 });
 
-            modelBuilder.Entity("DO_AN.Models.Customer", b =>
+            modelBuilder.Entity("TicketGo.Domain.Entities.Customer", b =>
                 {
                     b.Property<int>("IdCus")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("ID_Cus");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdCus"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdCus"));
 
                     b.Property<string>("FullName")
                         .HasMaxLength(50)
@@ -126,14 +123,14 @@ namespace TicketGo.Infrastructure.Migrations
                     b.ToTable("Customer", (string)null);
                 });
 
-            modelBuilder.Entity("DO_AN.Models.Discount", b =>
+            modelBuilder.Entity("TicketGo.Domain.Entities.Discount", b =>
                 {
                     b.Property<int>("IdDiscount")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("ID_Discount");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdDiscount"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdDiscount"));
 
                     b.Property<string>("Information")
                         .HasMaxLength(150)
@@ -153,17 +150,17 @@ namespace TicketGo.Infrastructure.Migrations
                     b.ToTable("Discount", (string)null);
                 });
 
-            modelBuilder.Entity("DO_AN.Models.Order", b =>
+            modelBuilder.Entity("TicketGo.Domain.Entities.Order", b =>
                 {
                     b.Property<int>("IdOrder")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("ID_Order");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdOrder"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdOrder"));
 
                     b.Property<DateTime?>("DateOrder")
-                        .HasColumnType("date")
+                        .HasColumnType("datetime")
                         .HasColumnName("Date_Order");
 
                     b.Property<int?>("IdCus")
@@ -199,14 +196,14 @@ namespace TicketGo.Infrastructure.Migrations
                     b.ToTable("Order", (string)null);
                 });
 
-            modelBuilder.Entity("DO_AN.Models.OrderTicket", b =>
+            modelBuilder.Entity("TicketGo.Domain.Entities.OrderTicket", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("ID");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("IdOrder")
                         .HasColumnType("int")
@@ -225,34 +222,34 @@ namespace TicketGo.Infrastructure.Migrations
                     b.ToTable("Order_Ticket", (string)null);
                 });
 
-            modelBuilder.Entity("DO_AN.Models.Role", b =>
+            modelBuilder.Entity("TicketGo.Domain.Entities.Role", b =>
                 {
                     b.Property<int>("IdRole")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("ID_Role");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdRole"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdRole"));
 
-                    b.Property<string>("NameRole")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)")
-                        .HasColumnName("Name_Role");
+                        .HasColumnName("Name");
 
                     b.HasKey("IdRole");
 
                     b.ToTable("Role", (string)null);
                 });
 
-            modelBuilder.Entity("DO_AN.Models.Seat", b =>
+            modelBuilder.Entity("TicketGo.Domain.Entities.Seat", b =>
                 {
                     b.Property<int>("IdSeat")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("ID_Seat");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdSeat"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdSeat"));
 
                     b.Property<int?>("IdCoach")
                         .HasColumnType("int")
@@ -273,17 +270,17 @@ namespace TicketGo.Infrastructure.Migrations
                     b.ToTable("Seat", (string)null);
                 });
 
-            modelBuilder.Entity("DO_AN.Models.Ticket", b =>
+            modelBuilder.Entity("TicketGo.Domain.Entities.Ticket", b =>
                 {
                     b.Property<int>("IdTicket")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("ID_Ticket");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdTicket"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdTicket"));
 
                     b.Property<DateTime?>("Date")
-                        .HasColumnType("date");
+                        .HasColumnType("datetime");
 
                     b.Property<int>("IdSeat")
                         .HasColumnType("int")
@@ -305,20 +302,20 @@ namespace TicketGo.Infrastructure.Migrations
                     b.ToTable("Ticket", (string)null);
                 });
 
-            modelBuilder.Entity("DO_AN.Models.Train", b =>
+            modelBuilder.Entity("TicketGo.Domain.Entities.Train", b =>
                 {
                     b.Property<int>("IdTrain")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("ID_Train");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdTrain"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdTrain"));
 
                     b.Property<decimal?>("CoefficientTrain")
-                        .HasColumnType("decimal(14,4)");
+                        .HasColumnType("decimal(14, 4)");
 
                     b.Property<DateTime?>("DateStart")
-                        .HasColumnType("date")
+                        .HasColumnType("datetime")
                         .HasColumnName("Date_Start");
 
                     b.Property<int>("IdTrainRoute")
@@ -337,14 +334,14 @@ namespace TicketGo.Infrastructure.Migrations
                     b.ToTable("Train", (string)null);
                 });
 
-            modelBuilder.Entity("DO_AN.Models.TrainRoute", b =>
+            modelBuilder.Entity("TicketGo.Domain.Entities.TrainRoute", b =>
                 {
                     b.Property<int>("IdTrainRoute")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("ID_TrainRoute");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdTrainRoute"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdTrainRoute"));
 
                     b.Property<string>("PointEnd")
                         .IsRequired()
@@ -363,211 +360,9 @@ namespace TicketGo.Infrastructure.Migrations
                     b.ToTable("TrainRoute", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
+            modelBuilder.Entity("TicketGo.Domain.Entities.Account", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("NormalizedName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedName")
-                        .IsUnique()
-                        .HasDatabaseName("RoleNameIndex")
-                        .HasFilter("[NormalizedName] IS NOT NULL");
-
-                    b.ToTable("AspNetRoles", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("ClaimType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClaimValue")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("RoleId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetRoleClaims", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("UserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedEmail")
-                        .HasDatabaseName("EmailIndex");
-
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasDatabaseName("UserNameIndex")
-                        .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("ClaimType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClaimValue")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("AspNetUserClaims", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
-                {
-                    b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
-
-                    b.Property<string>("ProviderKey")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
-
-                    b.Property<string>("ProviderDisplayName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("LoginProvider", "ProviderKey");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("AspNetUserLogins", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("RoleId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("UserId", "RoleId");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetUserRoles", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
-
-                    b.Property<string>("Value")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("UserId", "LoginProvider", "Name");
-
-                    b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("DO_AN.Models.Account", b =>
-                {
-                    b.HasOne("DO_AN.Models.Role", "IdRoleNavigation")
+                    b.HasOne("TicketGo.Domain.Entities.Role", "IdRoleNavigation")
                         .WithMany("Accounts")
                         .HasForeignKey("IdRole")
                         .IsRequired()
@@ -576,9 +371,9 @@ namespace TicketGo.Infrastructure.Migrations
                     b.Navigation("IdRoleNavigation");
                 });
 
-            modelBuilder.Entity("DO_AN.Models.Coach", b =>
+            modelBuilder.Entity("TicketGo.Domain.Entities.Coach", b =>
                 {
-                    b.HasOne("DO_AN.Models.Train", "IdTrainNavigation")
+                    b.HasOne("TicketGo.Domain.Entities.Train", "IdTrainNavigation")
                         .WithMany("Coaches")
                         .HasForeignKey("IdTrain")
                         .HasConstraintName("FK_Coach_Train");
@@ -586,9 +381,9 @@ namespace TicketGo.Infrastructure.Migrations
                     b.Navigation("IdTrainNavigation");
                 });
 
-            modelBuilder.Entity("DO_AN.Models.Customer", b =>
+            modelBuilder.Entity("TicketGo.Domain.Entities.Customer", b =>
                 {
-                    b.HasOne("DO_AN.Models.Account", "IdAccountNavigation")
+                    b.HasOne("TicketGo.Domain.Entities.Account", "IdAccountNavigation")
                         .WithMany("Customers")
                         .HasForeignKey("IdAccount")
                         .IsRequired()
@@ -597,14 +392,14 @@ namespace TicketGo.Infrastructure.Migrations
                     b.Navigation("IdAccountNavigation");
                 });
 
-            modelBuilder.Entity("DO_AN.Models.Order", b =>
+            modelBuilder.Entity("TicketGo.Domain.Entities.Order", b =>
                 {
-                    b.HasOne("DO_AN.Models.Customer", "IdCusNavigation")
+                    b.HasOne("TicketGo.Domain.Entities.Customer", "IdCusNavigation")
                         .WithMany("Orders")
                         .HasForeignKey("IdCus")
                         .HasConstraintName("FK_Order_Customer");
 
-                    b.HasOne("DO_AN.Models.Discount", "IdDiscountNavigation")
+                    b.HasOne("TicketGo.Domain.Entities.Discount", "IdDiscountNavigation")
                         .WithMany("Orders")
                         .HasForeignKey("IdDiscount")
                         .HasConstraintName("FK_Order_Discount");
@@ -614,15 +409,15 @@ namespace TicketGo.Infrastructure.Migrations
                     b.Navigation("IdDiscountNavigation");
                 });
 
-            modelBuilder.Entity("DO_AN.Models.OrderTicket", b =>
+            modelBuilder.Entity("TicketGo.Domain.Entities.OrderTicket", b =>
                 {
-                    b.HasOne("DO_AN.Models.Order", "IdOrderNavigation")
+                    b.HasOne("TicketGo.Domain.Entities.Order", "IdOrderNavigation")
                         .WithMany("OrderTickets")
                         .HasForeignKey("IdOrder")
                         .IsRequired()
                         .HasConstraintName("FK_Order_Ticket_Order");
 
-                    b.HasOne("DO_AN.Models.Ticket", "IdTicketNavigation")
+                    b.HasOne("TicketGo.Domain.Entities.Ticket", "IdTicketNavigation")
                         .WithMany("OrderTickets")
                         .HasForeignKey("IdTicket")
                         .IsRequired()
@@ -633,9 +428,9 @@ namespace TicketGo.Infrastructure.Migrations
                     b.Navigation("IdTicketNavigation");
                 });
 
-            modelBuilder.Entity("DO_AN.Models.Seat", b =>
+            modelBuilder.Entity("TicketGo.Domain.Entities.Seat", b =>
                 {
-                    b.HasOne("DO_AN.Models.Coach", "IdCoachNavigation")
+                    b.HasOne("TicketGo.Domain.Entities.Coach", "IdCoachNavigation")
                         .WithMany("Seats")
                         .HasForeignKey("IdCoach")
                         .HasConstraintName("FK_Seat_Coach");
@@ -643,15 +438,15 @@ namespace TicketGo.Infrastructure.Migrations
                     b.Navigation("IdCoachNavigation");
                 });
 
-            modelBuilder.Entity("DO_AN.Models.Ticket", b =>
+            modelBuilder.Entity("TicketGo.Domain.Entities.Ticket", b =>
                 {
-                    b.HasOne("DO_AN.Models.Seat", "IdSeatNavigation")
+                    b.HasOne("TicketGo.Domain.Entities.Seat", "IdSeatNavigation")
                         .WithMany("Tickets")
                         .HasForeignKey("IdSeat")
                         .IsRequired()
                         .HasConstraintName("FK_Ticket_Seat");
 
-                    b.HasOne("DO_AN.Models.Train", "IdTrainNavigation")
+                    b.HasOne("TicketGo.Domain.Entities.Train", "IdTrainNavigation")
                         .WithMany("Tickets")
                         .HasForeignKey("IdTrain")
                         .IsRequired()
@@ -662,9 +457,9 @@ namespace TicketGo.Infrastructure.Migrations
                     b.Navigation("IdTrainNavigation");
                 });
 
-            modelBuilder.Entity("DO_AN.Models.Train", b =>
+            modelBuilder.Entity("TicketGo.Domain.Entities.Train", b =>
                 {
-                    b.HasOne("DO_AN.Models.TrainRoute", "IdTrainRouteNavigation")
+                    b.HasOne("TicketGo.Domain.Entities.TrainRoute", "IdTrainRouteNavigation")
                         .WithMany("Trains")
                         .HasForeignKey("IdTrainRoute")
                         .IsRequired()
@@ -673,105 +468,54 @@ namespace TicketGo.Infrastructure.Migrations
                     b.Navigation("IdTrainRouteNavigation");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("DO_AN.Models.Account", b =>
+            modelBuilder.Entity("TicketGo.Domain.Entities.Account", b =>
                 {
                     b.Navigation("Customers");
                 });
 
-            modelBuilder.Entity("DO_AN.Models.Coach", b =>
+            modelBuilder.Entity("TicketGo.Domain.Entities.Coach", b =>
                 {
                     b.Navigation("Seats");
                 });
 
-            modelBuilder.Entity("DO_AN.Models.Customer", b =>
+            modelBuilder.Entity("TicketGo.Domain.Entities.Customer", b =>
                 {
                     b.Navigation("Orders");
                 });
 
-            modelBuilder.Entity("DO_AN.Models.Discount", b =>
+            modelBuilder.Entity("TicketGo.Domain.Entities.Discount", b =>
                 {
                     b.Navigation("Orders");
                 });
 
-            modelBuilder.Entity("DO_AN.Models.Order", b =>
+            modelBuilder.Entity("TicketGo.Domain.Entities.Order", b =>
                 {
                     b.Navigation("OrderTickets");
                 });
 
-            modelBuilder.Entity("DO_AN.Models.Role", b =>
+            modelBuilder.Entity("TicketGo.Domain.Entities.Role", b =>
                 {
                     b.Navigation("Accounts");
                 });
 
-            modelBuilder.Entity("DO_AN.Models.Seat", b =>
+            modelBuilder.Entity("TicketGo.Domain.Entities.Seat", b =>
                 {
                     b.Navigation("Tickets");
                 });
 
-            modelBuilder.Entity("DO_AN.Models.Ticket", b =>
+            modelBuilder.Entity("TicketGo.Domain.Entities.Ticket", b =>
                 {
                     b.Navigation("OrderTickets");
                 });
 
-            modelBuilder.Entity("DO_AN.Models.Train", b =>
+            modelBuilder.Entity("TicketGo.Domain.Entities.Train", b =>
                 {
                     b.Navigation("Coaches");
 
                     b.Navigation("Tickets");
                 });
 
-            modelBuilder.Entity("DO_AN.Models.TrainRoute", b =>
+            modelBuilder.Entity("TicketGo.Domain.Entities.TrainRoute", b =>
                 {
                     b.Navigation("Trains");
                 });

@@ -6,6 +6,7 @@ using TicketGo.Infrastructure.Data;
 using TicketGo.Infrastructure.Repositories;
 using TicketGo.Web.Middleware;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
@@ -13,7 +14,7 @@ builder.Services.AddControllersWithViews();
 
 // DB context
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("TicketGoConnection")));
 
 // Session
 builder.Services.AddDistributedMemoryCache();
