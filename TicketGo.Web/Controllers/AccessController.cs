@@ -47,29 +47,35 @@ namespace TicketGo.Web.Controllers
             if (success)
             {
                 TempData["SuccessMessage"] = "Đăng ký thành công! Vui lòng đăng nhập.";
+
+                // Gửi email xác thực
+                // {}
+
                 return RedirectToAction("Login");
             }
 
             ViewBag.Message = "Đăng ký thất bại. Vui lòng thử lại.";
             return View(registerDto);
         }
-
+        // [Đăng nhập]
         [HttpGet]
         public IActionResult Login()
         {
             return View();
         }
 
+        // [Đăng nhập]
         [HttpPost]
         public async Task<IActionResult> Login(Account user)
         {
             var myUser = await _accountService.LoginAsync(user.Email, user.Password);
             if (myUser != null)
-            {
+            {   
+                // Kiểm tra xem tài khoản admin hay customer
                 if (myUser.IdRole == 1)
                 {
                     HttpContext.Session.SetString("UserSession", myUser.Email);
-                    return RedirectToAction("Register", "Access");
+                    return RedirectToAction("Index", "Ticket", new { area = "Admin" });
                 }
                 else
                 {
@@ -87,36 +93,36 @@ namespace TicketGo.Web.Controllers
         {
             HttpContext.Session.Clear();
             HttpContext.Session.Remove("UserSession");
-            return RedirectToAction("Login", "Access");
+            return RedirectToAction("TrangChu", "Home");
         }
 
-        public IActionResult AccountInfo()
-        {
-            return View();
-        }
+        // public IActionResult AccountInfo()
+        // {
+        //     return View();
+        // }
 
-        [HttpGet]
-        public IActionResult VerifyEmail(string email)
-        {
-            var model = new VerifyEmailDto { Email = email };
-            return View(model);
-        }
+        // [HttpGet]
+        // public IActionResult VerifyEmail(string email)
+        // {
+        //     var model = new VerifyEmailDto { Email = email };
+        //     return View(model);
+        // }
 
-        [HttpPost]
-        public async Task<IActionResult> VerifyEmail(VerifyEmailDto model)
-        {
-            if (ModelState.IsValid)
-            {
-                var success = await _accountService.VerifyEmailAsync(model, HttpContext);
-                if (success)
-                {
-                    return RedirectToAction("TrangChu", "Home");
-                }
+        // [HttpPost]
+        // public async Task<IActionResult> VerifyEmail(VerifyEmailDto model)
+        // {
+        //     if (ModelState.IsValid)
+        //     {
+        //         var success = await _accountService.VerifyEmailAsync(model, HttpContext);
+        //         if (success)
+        //         {
+        //             return RedirectToAction("TrangChu", "Home");
+        //         }
 
-                ModelState.AddModelError(string.Empty, "Mã xác thực không chính xác hoặc đã hết hạn.");
-            }
+        //         ModelState.AddModelError(string.Empty, "Mã xác thực không chính xác hoặc đã hết hạn.");
+        //     }
 
-            return View(model);
-        }
+        //     return View(model);
+        // }
     }
 }

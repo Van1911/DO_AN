@@ -18,7 +18,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between h-16">
         <div class="flex-1 flex justify-center md:justify-start">
-            <a href="#" class="flex-shrink-0 flex items-center space-x-2">
+            <a asp-action="TrangChu" asp-controller="Home" class="flex-shrink-0 flex items-center space-x-2">
                 <span class="text-3xl font-extrabold text-lime-400 bg-clip-text text-transparent bg-gradient-to-r from-lime-400 to-white tracking-tight transform hover:scale-105 transition-all duration-300">
                     TicketGo
                 </span>
@@ -37,10 +37,13 @@
                     <span class="mr-2">Hi, @Email</span>
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                 </a>
+                <a asp-action="Logout" asp-controller="Access" class="block text-white hover:text-lime-400 font-medium px-4 py-2 rounded-lg hover:bg-navy-700 transition-all duration-300">
+                    <span class="mr-2">Đăng xuất</span>
+                </a>
             }
             else
             {
-                <a href="/Access/Login" class="text-white hover:text-lime-400 font-medium px-4 py-2 rounded-full hover:bg-navy-600 transition-all duration-300">Đăng nhập</a>
+                <a asp-action="Login" asp-controller="Access" class="text-white hover:text-lime-400 font-medium px-4 py-2 rounded-full hover:bg-navy-600 transition-all duration-300">Đăng nhập</a>
             }
         </div>
         <div class="md:hidden flex items-center">

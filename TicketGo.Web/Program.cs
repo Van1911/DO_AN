@@ -56,6 +56,20 @@ builder.Services.AddAuthentication("MyCookieAuth")
     {
         options.LoginPath = "/Access/Login";
         options.AccessDeniedPath = "/Error/403";
+         options.Events.OnRedirectToLogin = context =>
+        {
+            var requestPath = context.Request.Path;
+
+            // Nếu là API hoặc đường dẫn không tồn tại, không redirect mà trả về 404
+            if (context.Response.StatusCode == 404 || requestPath.StartsWithSegments("/"))
+            {
+                context.Response.Redirect("/Error/404");
+                return Task.CompletedTask;
+            }
+
+            context.Response.Redirect(context.RedirectUri);
+            return Task.CompletedTask;
+        };
     });
 
 builder.Services.AddAuthorization();
@@ -83,7 +97,12 @@ app.UseStatusCodePagesWithReExecute("/Error/{0}");
 app.UseSession();
 app.UseAuthentication(); 
 app.UseAuthorization();
+// Area Admin
+app.MapControllerRoute(
+    name: "areas",
+    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 
+// Default route
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=TrangChu}/{id?}");
