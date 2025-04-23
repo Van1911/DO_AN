@@ -8,23 +8,21 @@ using Microsoft.AspNetCore.Authorization;
 namespace TicketGo.Web.Areas.Admin.Controllers
 {
     [Authorize(Roles = "Admin")]
-    [Area("admin")]
-    public class HomeAdminController : Controller
+    [Area("Admin")]
+    public class TicketController : Controller
     {
         private readonly ITicketService _ticketService;
 
-        public HomeAdminController(ITicketService ticketService)
+        public TicketController(ITicketService ticketService)
         {
             _ticketService = ticketService;
         }
 
-        [Route("index")]
+        [HttpGet]
         public IActionResult Index()
         {
             return View();
         }
-
-        [Route("danhmucve")]
         public async Task<IActionResult> DanhMucVe(int? page)
         {
             int pageSize = 8;
@@ -34,7 +32,6 @@ namespace TicketGo.Web.Areas.Admin.Controllers
             return View(lstVe);
         }
 
-        [HttpGet("{id}")]
         public async Task<IActionResult> SuaVe(int? id)
         {
             if (id == null)
@@ -66,8 +63,7 @@ namespace TicketGo.Web.Areas.Admin.Controllers
             return View(ticketDto);
         }
 
-        [HttpPost("{id}")]
-        [ValidateAntiForgeryToken]
+
         public async Task<IActionResult> SuaVe(int id, CreateUpdateTicketDto ticketDto)
         {
             if (id != ticketDto.IdTicket)
@@ -101,7 +97,6 @@ namespace TicketGo.Web.Areas.Admin.Controllers
             return View(ticketDto);
         }
 
-        [Route("xoaVe")]
         [HttpGet]
         public async Task<IActionResult> XoaVe(int? id)
         {
@@ -119,8 +114,7 @@ namespace TicketGo.Web.Areas.Admin.Controllers
             return View(ticket);
         }
 
-        [HttpPost, ActionName("XoaVe")]
-        [ValidateAntiForgeryToken]
+        [HttpPost]
         public async Task<IActionResult> XacNhanXoa(int id)
         {
             await _ticketService.DeleteTicketAsync(id);
