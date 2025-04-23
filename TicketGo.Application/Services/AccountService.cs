@@ -20,7 +20,8 @@ namespace TicketGo.Application.Services
             _roleRepository = roleRepository;
         }
 
-        public async Task<bool> RegisterAsync(AccountDto registerDto)
+        // [Đăng ký tài khoản]
+        public async Task<bool> RegisterAsync(RegisterDto registerDto)
         {
             // Tạo tài khoản mới
             var newAccount = new Account // Changed from AccountDto to Account
@@ -39,14 +40,12 @@ namespace TicketGo.Application.Services
             // Tạo khách hàng mới liên kết với tài khoản
             var newCustomer = new Customer
             {
-                IdCus = newAccount.IdAccount,
                 IdAccount = newAccount.IdAccount,
-                // FullName = newAccount.FullName
+                FullName = registerDto.Fullname
             };
 
             // Lưu khách hàng
             await _customerRepository.AddAsync(newCustomer);
-
             return true;
         }
 
@@ -93,6 +92,7 @@ namespace TicketGo.Application.Services
         {
             return Guid.NewGuid().ToString().Substring(0, 6); // Lấy 6 ký tự đầu tiên
         }
+        // [Lấy ra danh sách tài khoản]
         public async Task<List<AccountDto>> GetAllAccountsAsync()
         {
             var accounts = await _accountRepository.GetAllAsync();

@@ -1,9 +1,12 @@
-﻿namespace TicketGo.Application.DTOs
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+
+namespace TicketGo.Application.DTOs
 {
     public class AccountDto
     {
         public int IdAccount { get; set; }
-        // public string Fullname { get; set; } = null!;
+        public string Fullname { get; set; } = null!;
         public string Phone { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
@@ -25,4 +28,17 @@
         public int IdRole { get; set; }
     }
 
+    // [Tạo tài khoản mới]
+   public class RegisterDto
+    {
+  
+        public string Fullname { get; set; } = null!;    
+        public string Phone { get; set; }   
+        public string Email { get; set; }
+        public string Password { get; set; }
+        [Compare("Password", ErrorMessage = "Mật khẩu nhập lại không khớp")]
+        public string ConfirmPassword { get; set; }
+        public bool? Sex { get; set; }
+        public DateTime? DateOfBirth { get; set; }
+    }
 }

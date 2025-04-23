@@ -14,27 +14,43 @@ namespace TicketGo.Web.Controllers
         {
             _accountService = accountService;
         }
-
+        // [Đăng ký tài khoản]
         [HttpGet]
         public IActionResult Register()
         {
             return View();
         }
-
+        
+        // [Đăng ký tài khoản]
         [HttpPost]
-        public async Task<IActionResult> Register(AccountDto registerDto)
+        public async Task<IActionResult> Register(RegisterDto registerDto)
         {
-            if (ModelState.IsValid)
+            // Kiểm tra email đã tồn tại trước khi validate model
+            var existingAccount = await _accountService.GetAllAccountsAsync();
+            if (existingAccount.Any(a => a.Email == registerDto.Email))
             {
-                var success = await _accountService.RegisterAsync(registerDto);
-                if (success)
-                {
-                    ViewBag.Status = 1; // Đăng ký thành công
-                    return RedirectToAction("Login");
-                }
+                ModelState.AddModelError("Email", "Email đã tồn tại.");
+                return View(registerDto);
             }
 
-            ViewBag.Status = 0; // Đăng ký thất bại
+            // Nếu model không hợp lệ
+            if (!ModelState.IsValid)
+            {
+                var allErrors = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage);
+                return View(registerDto);
+            }
+
+            // Đăng ký nếu mọi thứ hợp lệ
+            var success = await _accountService.RegisterAsync(registerDto);
+            if (success)
+            {
+                TempData["SuccessMessage"] = "Đăng ký thành công! Vui lòng đăng nhập.";
+                return RedirectToAction("Login");
+            }
+
+            ViewBag.Message = "Đăng ký thất bại. Vui lòng thử lại.";
             return View(registerDto);
         }
 
