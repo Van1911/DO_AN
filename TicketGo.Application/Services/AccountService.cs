@@ -48,7 +48,7 @@ namespace TicketGo.Application.Services
             await _customerRepository.AddAsync(newCustomer);
             return true;
         }
-
+        //[Đăng nhập tài khoản]
         public async Task<Account> LoginAsync(string email, string password)
         {
             return await _accountRepository.GetByEmailAndPasswordAsync(email, password);
@@ -130,8 +130,8 @@ namespace TicketGo.Application.Services
                 RoleName = account.IdRoleNavigation?.Name
             };
         }
-
-        public async Task CreateAccountAsync(CreateUpdateAccountDto accountDto)
+        //[Tạo tài khoản]
+        public async Task CreateAccountAsync(AccountDto accountDto)
         {
             var account = new Account
             {
@@ -146,7 +146,7 @@ namespace TicketGo.Application.Services
             await _accountRepository.AddAsync(account);
         }
 
-        public async Task UpdateAccountAsync(int id, CreateUpdateAccountDto accountDto)
+        public async Task UpdateAccountAsync(int id, AccountDto accountDto)
         {
             var account = await _accountRepository.GetByIdAsync(id);
             if (account == null)

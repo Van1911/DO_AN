@@ -6,16 +6,22 @@ namespace TicketGo.Application.Interfaces
 {
     public interface IAccountService
     {
+        //[Đăng ký tài khoản]
         Task<bool> RegisterAsync(RegisterDto registerDto);
+        //[Đăng nhập tài khoản]
         Task<Account> LoginAsync(string email, string password);
+        //[Danh sách tài khoản]
+        Task<List<AccountDto>> GetAllAccountsAsync();
+        //[Chi tiết tài khoản]
+        Task<AccountDto> GetAccountByIdAsync(int id);
+        //[Tạo tài khoản]
+        Task CreateAccountAsync(AccountDto accountDto);
+        //[Cập nhật tài khoản]
+        Task UpdateAccountAsync(int id, AccountDto accountDto);
+        //[Xóa tài khoản]
+        Task DeleteAccountAsync(int id);
         Task<bool> VerifyEmailAsync(VerifyEmailDto verifyEmailDto, HttpContext httpContext);
         string GenerateVerificationCode();
-
-        Task<List<AccountDto>> GetAllAccountsAsync();
-        Task<AccountDto> GetAccountByIdAsync(int id);
-        Task CreateAccountAsync(CreateUpdateAccountDto accountDto);
-        Task UpdateAccountAsync(int id, CreateUpdateAccountDto accountDto);
-        Task DeleteAccountAsync(int id);
         Task<List<RoleDto>> GetAllRolesAsync();
     }
 }
