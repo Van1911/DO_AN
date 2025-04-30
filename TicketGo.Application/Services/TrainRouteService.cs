@@ -41,7 +41,7 @@ namespace TicketGo.Application.Services
             };
         }
 
-        public async Task CreateTrainRouteAsync(CreateUpdateTrainRouteDto trainRouteDto)
+        public async Task CreateTrainRouteAsync(TrainRouteDto trainRouteDto)
         {
             var trainRoute = new TrainRoute
             {
@@ -52,7 +52,7 @@ namespace TicketGo.Application.Services
             await _trainRouteRepository.AddAsync(trainRoute);
         }
 
-        public async Task UpdateTrainRouteAsync(int id, CreateUpdateTrainRouteDto trainRouteDto)
+        public async Task UpdateTrainRouteAsync(int id, TrainRouteDto trainRouteDto)
         {
             var trainRoute = await _trainRouteRepository.GetByIdAsync(id);
             if (trainRoute == null)

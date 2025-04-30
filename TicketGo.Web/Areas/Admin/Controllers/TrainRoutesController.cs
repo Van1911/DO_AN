@@ -2,6 +2,8 @@
 using TicketGo.Application.Interfaces;
 using TicketGo.Application.DTOs;
 using Microsoft.AspNetCore.Authorization;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Antiforgery;
 
 namespace TicketGo.Web.Areas.Admin.Controllers
 {   
@@ -10,12 +12,15 @@ namespace TicketGo.Web.Areas.Admin.Controllers
     public class TrainRoutesController : Controller
     {
         private readonly ITrainRouteService _trainRouteService;
+        private readonly ILogger<TrainRoutesController> _logger;
 
-        public TrainRoutesController(ITrainRouteService trainRouteService)
+        public TrainRoutesController(ITrainRouteService trainRouteService, ILogger<TrainRoutesController> logger)
         {
             _trainRouteService = trainRouteService;
+            _logger = logger;
         }
 
+        //[Danh đường tuyến đường]
         // GET: Admin/TrainRoutes
         public async Task<IActionResult> Index()
         {
@@ -23,120 +28,124 @@ namespace TicketGo.Web.Areas.Admin.Controllers
             return View(trainRoutes);
         }
 
-        // GET: Admin/TrainRoutes/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var trainRoute = await _trainRouteService.GetTrainRouteByIdAsync(id.Value);
-            if (trainRoute == null)
-            {
-                return NotFound();
-            }
-
-            return View(trainRoute);
-        }
-
-        // GET: Admin/TrainRoutes/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
+        //[Thêm tuyến đường]
         // POST: Admin/TrainRoutes/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CreateUpdateTrainRouteDto trainRouteDto)
+        public async Task<IActionResult> Create([FromForm] TrainRouteDto trainRouteDto)
         {
-            if (ModelState.IsValid)
+            _logger.LogInformation("Create action called with data: {@TrainRouteDto}", trainRouteDto);
+
+            // Server-side validation
+            if (string.IsNullOrWhiteSpace(trainRouteDto.PointStart) || string.IsNullOrWhiteSpace(trainRouteDto.PointEnd))
             {
+                ModelState.AddModelError("", "Điểm đi và điểm đến không được để trống");
+            }
+            else if (!trainRouteDto.PointStart.All(c => char.IsLetter(c) || char.IsWhiteSpace(c)) ||
+                     !trainRouteDto.PointEnd.All(c => char.IsLetter(c) || char.IsWhiteSpace(c)))
+            {
+                ModelState.AddModelError("", "Điểm đi và điểm đến chỉ được chứa chữ cái và khoảng trắng");
+            }
+            else if (trainRouteDto.PointStart.Trim() == trainRouteDto.PointEnd.Trim())
+            {
+                ModelState.AddModelError("PointEnd", "Điểm đi và điểm đến không được trùng nhau");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Validation failed: {@ModelStateErrors}", ModelState);
+                var trainRoutes = await _trainRouteService.GetAllTrainRoutesAsync();
+                return View("Index", trainRoutes); // Return Index with errors
+            }
+
+            try
+            {
+                _logger.LogInformation("Attempting to create train route");
                 await _trainRouteService.CreateTrainRouteAsync(trainRouteDto);
-                return RedirectToAction(nameof(Index));
+                _logger.LogInformation("Train route created successfully");
+                TempData["SuccessMessage"] = "Tuyến đường đã được thêm!";
+                var updatedRoutes = await _trainRouteService.GetAllTrainRoutesAsync();
+                return View("Index", updatedRoutes);
             }
-
-            return View(trainRouteDto);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating train route");
+                ModelState.AddModelError("", "Lỗi khi tạo tuyến đường: " + ex.Message);
+                var trainRoutes = await _trainRouteService.GetAllTrainRoutesAsync();
+                return View("Index", trainRoutes);
+            }
         }
 
-        // GET: Admin/TrainRoutes/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var trainRoute = await _trainRouteService.GetTrainRouteByIdAsync(id.Value);
-            if (trainRoute == null)
-            {
-                return NotFound();
-            }
-
-            var trainRouteDto = new CreateUpdateTrainRouteDto
-            {
-                IdTrainRoute = trainRoute.IdTrainRoute,
-                PointStart = trainRoute.PointStart,
-                PointEnd = trainRoute.PointEnd
-            };
-
-            return View(trainRouteDto);
-        }
-
-        // POST: Admin/TrainRoutes/Edit/5
+        //[Sửa tuyến đường]
+        // POST: Admin/TrainRoutes/Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, CreateUpdateTrainRouteDto trainRouteDto)
+        public async Task<IActionResult> Edit([FromForm] TrainRouteDto trainRouteDto)
         {
-            if (id != trainRouteDto.IdTrainRoute)
+            // Server-side validation
+            if (string.IsNullOrWhiteSpace(trainRouteDto.PointStart) || string.IsNullOrWhiteSpace(trainRouteDto.PointEnd))
             {
-                return NotFound();
+                ModelState.AddModelError("", "Điểm đi và điểm đến không được để trống");
+            }
+            else if (!trainRouteDto.PointStart.All(c => char.IsLetter(c) || char.IsWhiteSpace(c)) ||
+                     !trainRouteDto.PointEnd.All(c => char.IsLetter(c) || char.IsWhiteSpace(c)))
+            {
+                ModelState.AddModelError("", "Điểm đi và điểm đến chỉ được chứa chữ cái và khoảng trắng");
+            }
+            else if (trainRouteDto.PointStart.Trim() == trainRouteDto.PointEnd.Trim())
+            {
+                ModelState.AddModelError("PointEnd", "Điểm đi và điểm đến không được trùng nhau");
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    await _trainRouteService.UpdateTrainRouteAsync(id, trainRouteDto);
-                }
-                catch (Exception)
-                {
-                    if (await _trainRouteService.GetTrainRouteByIdAsync(id) != null)
-                    {
-                        return NotFound();
-                    }
-                    throw;
-                }
-                return RedirectToAction(nameof(Index));
+                _logger.LogWarning("Validation failed: {@ModelStateErrors}", ModelState);
+                var trainRoutes = await _trainRouteService.GetAllTrainRoutesAsync();
+                return View("Index", trainRoutes);
             }
 
-            return View(trainRouteDto);
+            try
+            {
+                var existingRoute = await _trainRouteService.GetTrainRouteByIdAsync(trainRouteDto.IdTrainRoute);
+                if (existingRoute == null) return NotFound();
+
+                await _trainRouteService.UpdateTrainRouteAsync(trainRouteDto.IdTrainRoute, trainRouteDto);
+                TempData["SuccessMessage"] = "Tuyến đường đã được cập nhật!";
+                var updatedRoutes = await _trainRouteService.GetAllTrainRoutesAsync();
+                return View("Index", updatedRoutes);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating train route with ID: {Id}", trainRouteDto.IdTrainRoute);
+                ModelState.AddModelError("", "Lỗi khi cập nhật tuyến đường: " + ex.Message);
+                var trainRoutes = await _trainRouteService.GetAllTrainRoutesAsync();
+                return View("Index", trainRoutes);
+            }
         }
 
-        // GET: Admin/TrainRoutes/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // [Xóa tuyến đường]
+        // POST: Admin/TrainRoutes/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var trainRoute = await _trainRouteService.GetTrainRouteByIdAsync(id.Value);
+            var trainRoute = await _trainRouteService.GetTrainRouteByIdAsync(id);
             if (trainRoute == null)
             {
                 return NotFound();
             }
-
-            return View(trainRoute);
-        }
-
-        // POST: Admin/TrainRoutes/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            await _trainRouteService.DeleteTrainRouteAsync(id);
+            try
+            {
+                _logger.LogInformation("Attempting to delete train route with ID: {Id}", id);
+                await _trainRouteService.DeleteTrainRouteAsync(id);
+                _logger.LogInformation("Train route deleted successfully");
+                TempData["SuccessMessage"] = "Đã xóa tuyến đường!";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting train route with ID: {Id}", id);
+                TempData["ErrorMessage"] = "Lỗi khi xóa tuyến đường: " + ex.Message;
+            }
             return RedirectToAction(nameof(Index));
         }
     }
