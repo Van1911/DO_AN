@@ -45,8 +45,13 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<ITrainService, TrainService>();
 builder.Services.AddScoped<ICoachService, CoachService>();
 builder.Services.AddScoped<ITrainRouteService, TrainRouteService>();
+builder.Services.AddScoped<IDiscountService, DiscountService>();
+builder.Services.AddScoped<ISeatService, SeatService>();
+
 builder.Services.AddScoped<IEmailSender, EmailSender>();
 builder.Services.AddScoped<IVNPayService, VNPayService>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
 
 builder.Services.AddHttpContextAccessor();
 

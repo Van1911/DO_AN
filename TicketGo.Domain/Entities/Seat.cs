@@ -10,12 +10,12 @@ namespace TicketGo.Domain.Entities
             Tickets = new HashSet<Ticket>();
         }
 
-        public int IdSeat { get; set; }
-        public string? NameSeat { get; set; } = null!;
+        public int? IdSeat { get; set; }
+        public string NameSeat { get; set; }
         public bool State { get; set; }
-        public int? IdCoach { get; set; }
+        public int IdCoach { get; set; }
 
-        public virtual Coach? IdCoachNavigation { get; set; }= null!;
+        public virtual Coach IdCoachNavigation { get; set; }
         public virtual ICollection<Ticket> Tickets { get; set; }
     }
 }

@@ -10,5 +10,9 @@ namespace TicketGo.Domain.Interfaces
         Task AddAsync(Seat seat);
         Task UpdateAsync(Seat seat);
         Task DeleteAsync(int id);
+        //[Thêm nhiều ghế]
+        Task AddRangeAsync(IEnumerable<Seat> seats);
+        //[Xóa nhiều ghế]
+        Task DeleteByCoachIdAsync(int coachId);
     }
 }
