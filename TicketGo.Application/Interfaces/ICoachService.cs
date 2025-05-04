@@ -7,8 +7,8 @@ namespace TicketGo.Application.Interfaces
     {
         Task<List<CoachDto>> GetAllCoachesAsync();
         Task<CoachDto> GetCoachByIdAsync(int id);
-        Task CreateCoachAsync(CreateUpdateCoachDto coachDto);
-        Task UpdateCoachAsync(int id, CreateUpdateCoachDto coachDto);
+        Task CreateCoachAsync(CoachDto coachDto);
+        Task UpdateCoachAsync(int id, CoachDto coachDto);
         Task DeleteCoachAsync(int id);
         Task<List<TrainDto>> GetAllTrainsAsync();
     }

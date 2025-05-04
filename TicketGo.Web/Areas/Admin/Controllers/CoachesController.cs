@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using TicketGo.Application.Interfaces;
 using TicketGo.Application.DTOs;
 using Microsoft.AspNetCore.Authorization;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Antiforgery;
 
 namespace TicketGo.Web.Areas.Admin.Controllers
 {   
@@ -11,145 +12,172 @@ namespace TicketGo.Web.Areas.Admin.Controllers
     public class CoachesController : Controller
     {
         private readonly ICoachService _coachService;
+        private readonly ITrainService _trainService; 
 
-        public CoachesController(ICoachService coachService)
+        private readonly ISeatService _seatService;
+
+        public CoachesController(ICoachService coachService, ITrainService trainService, ISeatService seatService)
         {
+            _seatService = seatService;
             _coachService = coachService;
+            _trainService = trainService; 
         }
 
+        //[Danh sách xe]
         // GET: Admin/Coaches
         public async Task<IActionResult> Index()
         {
             var coaches = await _coachService.GetAllCoachesAsync();
+            var trains = await _trainService.GetAllTrainsAsync(); 
+            ViewData["Trains"] = trains; 
             return View(coaches);
         }
-
-        // GET: Admin/Coaches/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var coach = await _coachService.GetCoachByIdAsync(id.Value);
-            if (coach == null)
-            {
-                return NotFound();
-            }
-
-            return View(coach);
-        }
-
-        // GET: Admin/Coaches/Create
-        public async Task<IActionResult> Create()
-        {
-            var trains = await _coachService.GetAllTrainsAsync();
-            ViewData["IdTrain"] = new SelectList(trains, "IdTrain", "TrainName");
-            return View();
-        }
-
+        //[Thêm xe]
         // POST: Admin/Coaches/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CreateUpdateCoachDto coachDto)
+        public async Task<IActionResult> Create([FromForm] CoachDto coachDto)
         {
-            if (ModelState.IsValid)
+            // Server-side validation
+            if (string.IsNullOrWhiteSpace(coachDto.NameCoach))
+            {
+                ModelState.AddModelError("NameCoach", "Tên xe không được để trống");
+            }
+            else if (!coachDto.NameCoach.All(c => char.IsLetterOrDigit(c) || char.IsWhiteSpace(c)))
+            {
+                ModelState.AddModelError("NameCoach", "Tên xe chỉ được chứa chữ cái, số và khoảng trắng");
+            }
+            if (string.IsNullOrWhiteSpace(coachDto.Category))
+            {
+                ModelState.AddModelError("Category", "Loại xe không được để trống");
+            }
+            else if (!coachDto.Category.All(c => char.IsLetter(c) || char.IsWhiteSpace(c)))
+            {
+                ModelState.AddModelError("Category", "Loại xe chỉ được chứa chữ cái và khoảng trắng");
+            }
+            if (coachDto.SeatsQuantity < 1)
+            {
+                ModelState.AddModelError("SeatsQuantity", "Số lượng ghế phải lớn hơn 0");
+            }
+            if (coachDto.BasicPrice < 0)
+            {
+                ModelState.AddModelError("BasicPrice", "Giá cơ bản không được âm");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            try
             {
                 await _coachService.CreateCoachAsync(coachDto);
+
+                    
+                var updatedCoaches = await _coachService.GetAllCoachesAsync();
+                var trains = await _trainService.GetAllTrainsAsync();
+                // Re-pass trains on error
                 return RedirectToAction(nameof(Index));
             }
-
-            var trains = await _coachService.GetAllTrainsAsync();
-            ViewData["IdTrain"] = new SelectList(trains, "IdTrain", "TrainName", coachDto.IdTrain);
-            return View(coachDto);
-        }
-
-        // GET: Admin/Coaches/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
+            catch (Exception ex)
             {
-                return NotFound();
+                ModelState.AddModelError("", "Lỗi khi tạo xe: " + ex.Message);
+                var coaches = await _coachService.GetAllCoachesAsync();
+                var trains = await _trainService.GetAllTrainsAsync();
+                // Re-pass trains on error
+                return RedirectToAction(nameof(Index));
             }
-
-            var coach = await _coachService.GetCoachByIdAsync(id.Value);
-            if (coach == null)
-            {
-                return NotFound();
-            }
-
-            var trains = await _coachService.GetAllTrainsAsync();
-            ViewData["IdTrain"] = new SelectList(trains, "IdTrain", "TrainName", coach.IdTrain);
-
-            var coachDto = new CreateUpdateCoachDto
-            {
-                IdCoach = coach.IdCoach,
-                NameCoach = coach.NameCoach,
-                Category = coach.Category,
-                SeatsQuantity = coach.SeatsQuantity,
-                BasicPrice = coach.BasicPrice,
-                IdTrain = coach.IdTrain.Value
-            };
-
-            return View(coachDto);
         }
-
-        // POST: Admin/Coaches/Edit/5
+        //[Sửa thông tin xe]
+        // POST: Admin/Coaches/Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, CreateUpdateCoachDto coachDto)
+        public async Task<IActionResult> Edit([FromForm] CoachDto coachDto)
         {
-            if (id != coachDto.IdCoach)
+
+            // Server-side validation
+            if (string.IsNullOrWhiteSpace(coachDto.NameCoach))
             {
-                return NotFound();
+                ModelState.AddModelError("NameCoach", "Tên xe không được để trống");
+            }
+            else if (!coachDto.NameCoach.All(c => char.IsLetterOrDigit(c) || char.IsWhiteSpace(c)))
+            {
+                ModelState.AddModelError("NameCoach", "Tên xe chỉ được chứa chữ cái, số và khoảng trắng");
+            }
+            if (string.IsNullOrWhiteSpace(coachDto.Category))
+            {
+                ModelState.AddModelError("Category", "Loại xe không được để trống");
+            }
+            else if (!coachDto.Category.All(c => char.IsLetter(c) || char.IsWhiteSpace(c)))
+            {
+                ModelState.AddModelError("Category", "Loại xe chỉ được chứa chữ cái và khoảng trắng");
+            }
+            if (coachDto.SeatsQuantity < 1)
+            {
+                ModelState.AddModelError("SeatsQuantity", "Số lượng ghế phải lớn hơn 0");
+            }
+            if (coachDto.BasicPrice < 0)
+            {
+                ModelState.AddModelError("BasicPrice", "Giá cơ bản không được âm");
             }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    await _coachService.UpdateCoachAsync(id, coachDto);
-                }
-                catch (Exception)
-                {
-                    if (await _coachService.GetCoachByIdAsync(id) != null)
-                    {
-                        return NotFound();
-                    }
-                    throw;
-                }
+            if (!ModelState.IsValid)
+            {   
+                TempData["ErrorMessages"] = "Error: Dữ liệu không hợp lệ!";
                 return RedirectToAction(nameof(Index));
             }
 
-            var trains = await _coachService.GetAllTrainsAsync();
-            ViewData["IdTrain"] = new SelectList(trains, "IdTrain", "TrainName", coachDto.IdTrain);
-            return View(coachDto);
+            try
+            {
+                var existingCoach = await _coachService.GetCoachByIdAsync(coachDto.IdCoach.Value);
+                if (existingCoach == null)
+                {
+                    return NotFound();
+                }
+
+                await _coachService.UpdateCoachAsync(coachDto.IdCoach.Value, coachDto);
+                TempData["SuccessMessage"] = "Xe đã được cập nhật!";
+                var updatedCoaches = await _coachService.GetAllCoachesAsync();
+                var trains = await _trainService.GetAllTrainsAsync();
+                // Re-pass trains on error
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Lỗi khi cập nhật xe: " + ex.Message);
+                var coaches = await _coachService.GetAllCoachesAsync();
+                var trains = await _trainService.GetAllTrainsAsync();
+                // Re-pass trains on error
+                return RedirectToAction(nameof(Index));
+            }
         }
 
-        // GET: Admin/Coaches/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // POST: Admin/Coaches/Delete
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
 
-            var coach = await _coachService.GetCoachByIdAsync(id.Value);
+            var coach = await _coachService.GetCoachByIdAsync(id);
             if (coach == null)
             {
                 return NotFound();
             }
 
-            return View(coach);
-        }
+            try 
+            {
+                // Xóa ghế trong xe
+                await _seatService.DeleteSeatsAsync(coach.IdCoach.Value);
+                // Xóa xe
+                await _coachService.DeleteCoachAsync(coach.IdCoach.Value);
+                TempData["SuccessMessage"] = "Xe đã được xóa!";
 
-        // POST: Admin/Coaches/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            await _coachService.DeleteCoachAsync(id);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Lỗi khi xóa xe: " + ex.Message;
+            }
+
             return RedirectToAction(nameof(Index));
         }
     }
