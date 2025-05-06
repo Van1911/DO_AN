@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using TicketGo.Application.Interfaces;
 using TicketGo.Application.DTOs;
 using Microsoft.AspNetCore.Authorization;
+using System;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace TicketGo.Web.Areas.Admin.Controllers
 {   
@@ -12,143 +15,143 @@ namespace TicketGo.Web.Areas.Admin.Controllers
     {
         private readonly ITrainService _trainService;
 
-        public TrainsController(ITrainService trainService)
+        private readonly ITrainRouteService _trainRouteService;
+
+        public TrainsController(ITrainService trainService, ITrainRouteService trainRouteService)
         {
             _trainService = trainService;
+            _trainRouteService = trainRouteService;
         }
-
+        // [Danh sách chuyến xe]
         // GET: Admin/Trains
         public async Task<IActionResult> Index()
         {
             var trains = await _trainService.GetAllTrainsAsync();
+            var trainroutes = await _trainRouteService.GetAllTrainRoutesAsync(); 
+            ViewData["TrainRoutes"] = trainroutes; 
             return View(trains);
         }
 
-        // GET: Admin/Trains/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var train = await _trainService.GetTrainByIdAsync(id.Value);
-            if (train == null)
-            {
-                return NotFound();
-            }
-
-            return View(train);
-        }
-
-        // GET: Admin/Trains/Create
-        public async Task<IActionResult> Create()
-        {
-            var trainRoutes = await _trainService.GetAllTrainRoutesAsync();
-            ViewData["IdTrainRoute"] = new SelectList(trainRoutes, "IdTrainRoute", "PointStart", "PointEnd");
-            return View();
-        }
-
+        // [Thêm chuyến xe]
         // POST: Admin/Trains/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CreateUpdateTrainDto trainDto)
+        public async Task<IActionResult> Create([FromForm] TrainDto trainDto)
         {
-            if (ModelState.IsValid)
+            // Server-side validation
+            if (string.IsNullOrWhiteSpace(trainDto.NameTrain))
+            {
+                ModelState.AddModelError("NameTrain", "Tên chuyến xe không được để trống");
+            }
+            else if (!trainDto.NameTrain.All(c => char.IsLetterOrDigit(c) || char.IsWhiteSpace(c)))
+            {
+                ModelState.AddModelError("NameTrain", "Tên chuyến xe chỉ được chứa chữ cái, số và khoảng trắng");
+            }
+            if (trainDto.DateStart < DateTime.Now)
+            {
+                ModelState.AddModelError("DateStart", "Ngày khởi hành phải là ngày trong tương lai");
+            }
+            if (trainDto.CoefficientTrain <= 0)
+            {
+                ModelState.AddModelError("CoefficientTrain", "Hệ số chuyến xe phải lớn hơn 0");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                var trainRoutes = await _trainService.GetAllTrainRoutesAsync();
+                ViewData["IdTrainRoute"] = new SelectList(trainRoutes, "IdTrainRoute", "PointStart", trainDto.IdTrainRoute);
+
+                TempData["ErrorMessages"] = "Error: Dữ liệu không hợp lệ!";
+                return RedirectToAction(nameof(Index));
+            }
+
+            try
             {
                 await _trainService.CreateTrainAsync(trainDto);
+                TempData["SuccessMessage"] = "Chuyến xe đã được thêm!";
                 return RedirectToAction(nameof(Index));
             }
-
-            var trainRoutes = await _trainService.GetAllTrainRoutesAsync();
-            ViewData["IdTrainRoute"] = new SelectList(trainRoutes, "IdTrainRoute", "PointStart", trainDto.IdTrainRoute);
-            return View(trainDto);
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Lỗi khi tạo chuyến xe: " + ex.Message);
+                var trainRoutes = await _trainService.GetAllTrainRoutesAsync();
+                ViewData["IdTrainRoute"] = new SelectList(trainRoutes, "IdTrainRoute", "PointStart", trainDto.IdTrainRoute);
+                return RedirectToAction(nameof(Index));
+            }
         }
 
-        // GET: Admin/Trains/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var train = await _trainService.GetTrainByIdAsync(id.Value);
-            if (train == null)
-            {
-                return NotFound();
-            }
-
-            var trainRoutes = await _trainService.GetAllTrainRoutesAsync();
-            ViewData["IdTrainRoute"] = new SelectList(trainRoutes, "IdTrainRoute", "PointStart", train.IdTrainRoute);
-
-            var trainDto = new CreateUpdateTrainDto
-            {
-                IdTrain = train.IdTrain,
-                NameTrain = train.NameTrain,
-                DateStart = train.DateStart,
-                IdTrainRoute = train.IdTrainRoute,
-                CoefficientTrain = train.CoefficientTrain
-            };
-
-            return View(trainDto);
-        }
-
-        // POST: Admin/Trains/Edit/5
+        // [Sửa chuyến xe]
+        // POST: Admin/Trains/Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, CreateUpdateTrainDto trainDto)
+        public async Task<IActionResult> Edit([FromForm] TrainDto trainDto)
         {
-            if (id != trainDto.IdTrain)
+            // Server-side validation
+            if (string.IsNullOrWhiteSpace(trainDto.NameTrain))
             {
-                return NotFound();
+                ModelState.AddModelError("NameTrain", "Tên chuyến xe không được để trống");
+            }
+            else if (!trainDto.NameTrain.All(c => char.IsLetterOrDigit(c) || char.IsWhiteSpace(c)))
+            {
+                ModelState.AddModelError("NameTrain", "Tên chuyến xe chỉ được chứa chữ cái, số và khoảng trắng");
+            }
+            if (trainDto.DateStart < DateTime.Now)
+            {
+                ModelState.AddModelError("DateStart", "Ngày khởi hành phải là ngày trong tương lai");
+            }
+            if (trainDto.CoefficientTrain <= 0)
+            {
+                ModelState.AddModelError("CoefficientTrain", "Hệ số chuyến xe phải lớn hơn 0");
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    await _trainService.UpdateTrainAsync(id, trainDto);
-                }
-                catch (Exception)
-                {
-                    if (await _trainService.GetTrainByIdAsync(id) != null)
-                    {
-                        return NotFound();
-                    }
-                    throw;
-                }
+                var trainRoutes = await _trainService.GetAllTrainRoutesAsync();
+                ViewData["IdTrainRoute"] = new SelectList(trainRoutes, "IdTrainRoute", "PointStart", trainDto.IdTrainRoute);
+                
+                TempData["ErrorMessages"] = "Error: Dữ liệu không hợp lệ!";
                 return RedirectToAction(nameof(Index));
             }
 
-            var trainRoutes = await _trainService.GetAllTrainRoutesAsync();
-            ViewData["IdTrainRoute"] = new SelectList(trainRoutes, "IdTrainRoute", "PointStart", trainDto.IdTrainRoute);
-            return View(trainDto);
+            try
+            {
+                var existingTrain = await _trainService.GetTrainByIdAsync(trainDto.IdTrain.Value);
+                if (existingTrain == null) return NotFound();
+
+                await _trainService.UpdateTrainAsync(trainDto.IdTrain.Value, trainDto);
+                TempData["SuccessMessage"] = "Chuyến xe đã được cập nhật!";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Lỗi khi cập nhật chuyến xe: " + ex.Message);
+                var trainRoutes = await _trainService.GetAllTrainRoutesAsync();
+                ViewData["IdTrainRoute"] = new SelectList(trainRoutes, "IdTrainRoute", "PointStart", trainDto.IdTrainRoute);
+                return RedirectToAction(nameof(Index));
+            }
         }
 
-        // GET: Admin/Trains/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // [Xóa chuyến xe]
+        // POST: Admin/Trains/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var train = await _trainService.GetTrainByIdAsync(id.Value);
+            var train = await _trainService.GetTrainByIdAsync(id);
             if (train == null)
             {
                 return NotFound();
             }
 
-            return View(train);
-        }
-
-        // POST: Admin/Trains/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            await _trainService.DeleteTrainAsync(id);
+            try
+            {
+                await _trainService.DeleteTrainAsync(id);
+                TempData["SuccessMessage"] = "Đã xóa chuyến xe!";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Lỗi khi xóa chuyến xe: " + ex.Message;
+            }
             return RedirectToAction(nameof(Index));
         }
     }

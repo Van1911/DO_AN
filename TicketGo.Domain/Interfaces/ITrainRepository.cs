@@ -11,5 +11,8 @@ namespace TicketGo.Domain.Interfaces
         Task UpdateAsync(Train train);
         Task DeleteAsync(int id);
         Task<bool> ExistsAsync(int id);
+
+
+        IQueryable<Train> GetQueryable();
     }
 }

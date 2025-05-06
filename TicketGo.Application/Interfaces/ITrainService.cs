@@ -6,11 +6,12 @@ namespace TicketGo.Application.Interfaces
     {
         Task<List<string>> GetStartPointsAsync(string term);
         Task<List<string>> GetEndPointsAsync(string term);
-        Task<List<TrainResultDto>> SearchTrainsAsync(TrainSearchDto searchDto);
+        //[Tìm kiếm chuyến xe]
+        Task<PagedResult<TrainResponseDto>> SearchTrainsAsync(TrainSearchRequest searchDto);
         Task<List<TrainDto>> GetAllTrainsAsync();
         Task<TrainDto> GetTrainByIdAsync(int id);
-        Task CreateTrainAsync(CreateUpdateTrainDto trainDto);
-        Task UpdateTrainAsync(int id, CreateUpdateTrainDto trainDto);
+        Task CreateTrainAsync(TrainDto trainDto);
+        Task UpdateTrainAsync(int id, TrainDto trainDto);
         Task DeleteTrainAsync(int id);
         Task<List<TrainRouteDto>> GetAllTrainRoutesAsync();
     }

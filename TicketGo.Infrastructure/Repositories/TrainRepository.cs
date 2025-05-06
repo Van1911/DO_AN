@@ -78,6 +78,13 @@ namespace TicketGo.Infrastructure.Repositories
         {
             return await _context.Trains.AnyAsync(t => t.IdTrain == id);
         }
+
+
+
+        public IQueryable<Train> GetQueryable()
+        {
+            return _context.Trains.Include(t => t.IdTrainRouteNavigation);
+        }
     }
     
 }
