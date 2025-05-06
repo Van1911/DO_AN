@@ -115,14 +115,14 @@ namespace TicketGo.Application.Services
                 {
                     seat.State = true;
                     await _seatRepository.UpdateAsync(seat);
-                    var coach = await _coachRepository.GetCoachWithRelatedDataAsync(seat.IdCoach.Value);
+                    var coach = await _coachRepository.GetCoachWithRelatedDataAsync(seat.IdCoach);
 
                     var ticket = new Ticket
                     {
                         Date = DateTime.Now,
                         Price = orderDto.TotalPrice ?? 0,
-                        IdSeat = seat.IdSeat,
-                        IdTrain = (int)coach.IdTrain
+                        IdSeat = seat.IdSeat.Value,
+                        IdTrain = coach.IdTrain.Value
                     };
 
                     await _ticketRepository.AddAsync(ticket);
