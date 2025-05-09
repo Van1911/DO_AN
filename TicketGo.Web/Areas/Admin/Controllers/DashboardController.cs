@@ -15,10 +15,6 @@ namespace TicketGo.Web.Areas.Admin.Controllers
 
         public IActionResult Dashboard()
         {
-            if (HttpContext.Session.GetString("UserSession") != null)
-            {
-                ViewBag.MySession = HttpContext.Session.GetString("UserSession").ToString();
-            }
             return View();
         }
     }

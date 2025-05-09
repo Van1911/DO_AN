@@ -67,14 +67,12 @@ namespace TicketGo.Web.Areas.Admin.Controllers
             {
                 await _accountService.CreateAccountAsync(accountDto);
                 TempData["SuccessMessage"] = "Tài khoản đã được thêm!";
-                var updatedAccounts = await _accountService.GetAllAccountsAsync();
-                return View("Index", updatedAccounts);
+                return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
                 ModelState.AddModelError("", "Lỗi khi tạo tài khoản: " + ex.Message);
-                var accounts = await _accountService.GetAllAccountsAsync();
-                return View("Index", accounts);
+                return RedirectToAction(nameof(Index));
             }
         }
         
@@ -108,8 +106,7 @@ namespace TicketGo.Web.Areas.Admin.Controllers
 
             if (!ModelState.IsValid)
             {
-                var accounts = await _accountService.GetAllAccountsAsync();
-                return View("Index", accounts);
+                return RedirectToAction(nameof(Index));
             }
 
             try
@@ -122,14 +119,12 @@ namespace TicketGo.Web.Areas.Admin.Controllers
 
                 await _accountService.UpdateAccountAsync(accountDto.IdAccount.Value, accountDto);
                 TempData["SuccessMessage"] = "Tài khoản đã được cập nhật!";
-                var updatedAccounts = await _accountService.GetAllAccountsAsync();
-                return View("Index", updatedAccounts);
+                return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
                 ModelState.AddModelError("", "Lỗi khi cập nhật tài khoản: " + ex.Message);
-                var accounts = await _accountService.GetAllAccountsAsync();
-                return View("Index", accounts);
+                return RedirectToAction(nameof(Index));
             }
         }
 

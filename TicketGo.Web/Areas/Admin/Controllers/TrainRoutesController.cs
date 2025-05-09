@@ -12,12 +12,10 @@ namespace TicketGo.Web.Areas.Admin.Controllers
     public class TrainRoutesController : Controller
     {
         private readonly ITrainRouteService _trainRouteService;
-        private readonly ILogger<TrainRoutesController> _logger;
 
-        public TrainRoutesController(ITrainRouteService trainRouteService, ILogger<TrainRoutesController> logger)
+        public TrainRoutesController(ITrainRouteService trainRouteService)
         {
             _trainRouteService = trainRouteService;
-            _logger = logger;
         }
 
         //[Danh đường tuyến đường]
@@ -34,7 +32,6 @@ namespace TicketGo.Web.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([FromForm] TrainRouteDto trainRouteDto)
         {
-            _logger.LogInformation("Create action called with data: {@TrainRouteDto}", trainRouteDto);
 
             // Server-side validation
             if (string.IsNullOrWhiteSpace(trainRouteDto.PointStart) || string.IsNullOrWhiteSpace(trainRouteDto.PointEnd))
@@ -53,26 +50,19 @@ namespace TicketGo.Web.Areas.Admin.Controllers
 
             if (!ModelState.IsValid)
             {
-                _logger.LogWarning("Validation failed: {@ModelStateErrors}", ModelState);
-                var trainRoutes = await _trainRouteService.GetAllTrainRoutesAsync();
-                return View("Index", trainRoutes); // Return Index with errors
+                return RedirectToAction(nameof(Index));
             }
 
             try
             {
-                _logger.LogInformation("Attempting to create train route");
                 await _trainRouteService.CreateTrainRouteAsync(trainRouteDto);
-                _logger.LogInformation("Train route created successfully");
                 TempData["SuccessMessage"] = "Tuyến đường đã được thêm!";
-                var updatedRoutes = await _trainRouteService.GetAllTrainRoutesAsync();
-                return View("Index", updatedRoutes);
+                return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error creating train route");
                 ModelState.AddModelError("", "Lỗi khi tạo tuyến đường: " + ex.Message);
-                var trainRoutes = await _trainRouteService.GetAllTrainRoutesAsync();
-                return View("Index", trainRoutes);
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -99,9 +89,7 @@ namespace TicketGo.Web.Areas.Admin.Controllers
 
             if (!ModelState.IsValid)
             {
-                _logger.LogWarning("Validation failed: {@ModelStateErrors}", ModelState);
-                var trainRoutes = await _trainRouteService.GetAllTrainRoutesAsync();
-                return View("Index", trainRoutes);
+                return RedirectToAction(nameof(Index));
             }
 
             try
@@ -111,15 +99,12 @@ namespace TicketGo.Web.Areas.Admin.Controllers
 
                 await _trainRouteService.UpdateTrainRouteAsync(trainRouteDto.IdTrainRoute, trainRouteDto);
                 TempData["SuccessMessage"] = "Tuyến đường đã được cập nhật!";
-                var updatedRoutes = await _trainRouteService.GetAllTrainRoutesAsync();
-                return View("Index", updatedRoutes);
+
+                return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating train route with ID: {Id}", trainRouteDto.IdTrainRoute);
-                ModelState.AddModelError("", "Lỗi khi cập nhật tuyến đường: " + ex.Message);
-                var trainRoutes = await _trainRouteService.GetAllTrainRoutesAsync();
-                return View("Index", trainRoutes);
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -136,14 +121,11 @@ namespace TicketGo.Web.Areas.Admin.Controllers
             }
             try
             {
-                _logger.LogInformation("Attempting to delete train route with ID: {Id}", id);
                 await _trainRouteService.DeleteTrainRouteAsync(id);
-                _logger.LogInformation("Train route deleted successfully");
                 TempData["SuccessMessage"] = "Đã xóa tuyến đường!";
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting train route with ID: {Id}", id);
                 TempData["ErrorMessage"] = "Lỗi khi xóa tuyến đường: " + ex.Message;
             }
             return RedirectToAction(nameof(Index));

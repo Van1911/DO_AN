@@ -64,5 +64,43 @@ namespace TicketGo.Infrastructure.Repositories
         {
             return await _context.Accounts.AnyAsync(a => a.IdAccount == id);
         }
+
+    public async Task<string> GenerateTokenAsync(Account account)
+    {
+        var tokenValue = Guid.NewGuid().ToString();
+
+        var token = new Token
+        {
+            Value = tokenValue,
+            ExpiredAt = DateTime.UtcNow.AddHours(24),
+            AccountId = account.IdAccount
+        };
+
+        _context.Tokens.Add(token);
+        await _context.SaveChangesAsync();
+
+        return tokenValue;
+    }
+
+    public async Task<bool> VerifyEmailAsync(string email, string tokenValue)
+    {
+        var account = await _context.Accounts
+            .Include(a => a.Tokens)
+            .FirstOrDefaultAsync(a => a.Email == email);
+
+        if (account == null)
+            return false;
+
+        var token = account.Tokens.FirstOrDefault(t => t.Value == tokenValue && t.ExpiredAt > DateTime.UtcNow);
+        if (token == null)
+            return false;
+
+        account.IsEmailConfirmed = true;
+        _context.Tokens.Remove(token);
+
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
     }
 }

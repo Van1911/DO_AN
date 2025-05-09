@@ -82,7 +82,7 @@ namespace TicketGo.Application.Services
             var seats = await _seatRepository.GetAllAsync();
             return seats.Select(s => new SeatDto
             {
-                IdSeat = s.IdSeat,
+                IdSeat = s.IdSeat.Value,
                 NameSeat = s.NameSeat
             }).ToList();
         }
