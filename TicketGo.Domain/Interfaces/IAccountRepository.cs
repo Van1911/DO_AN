@@ -12,5 +12,9 @@ namespace TicketGo.Domain.Interfaces
         Task UpdateAsync(Account account);
         Task DeleteAsync(int id);
         Task<bool> ExistsAsync(int id);
+        
+        //
+        Task<string> GenerateTokenAsync(Account account);
+        Task<bool> VerifyEmailAsync(string email, string token);
     }
 }

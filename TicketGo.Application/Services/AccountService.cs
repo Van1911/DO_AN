@@ -54,6 +54,11 @@ namespace TicketGo.Application.Services
             return await _accountRepository.GetByEmailAndPasswordAsync(email, password);
         }
 
+        //[Tìm tài khoản theo email]
+        public async Task<Account> GetByEmailAsync(string email)
+        {
+            return await _accountRepository.GetByEmailAsync(email);
+        }
         public async Task<bool> VerifyEmailAsync(VerifyEmailDto verifyEmailDto, HttpContext httpContext)
         {
             // Lấy mã xác thực từ Session và kiểm tra thời gian hết hạn
@@ -177,6 +182,16 @@ namespace TicketGo.Application.Services
                 IdRole = r.IdRole,
                 RoleName = r.Name
             }).ToList();
+        }
+        //[Xac thuc email]
+        public async Task<bool> VerifyEmailAsync(string email, string token)
+        {
+            return await _accountRepository.VerifyEmailAsync(email, token);
+        }
+
+        public async Task<string> GenerateTokenAsync(Account account)
+        {
+            return await _accountRepository.GenerateTokenAsync(account);
         }
     }
 }

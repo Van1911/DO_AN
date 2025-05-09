@@ -17,8 +17,12 @@ namespace TicketGo.Domain.Entities
         public bool? Sex { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public int IdRole { get; set; }
+        public bool IsEmailConfirmed { get; set; } = false;
+
 
         public virtual Role IdRoleNavigation { get; set; } = null!;
         public virtual ICollection<Customer> Customers { get; set; }
+        public virtual ICollection<Token> Tokens { get; set; }
+
     }
 }

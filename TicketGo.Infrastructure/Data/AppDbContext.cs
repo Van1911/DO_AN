@@ -21,6 +21,7 @@ namespace TicketGo.Infrastructure.Data
         public virtual DbSet<Ticket> Tickets { get; set; } = null!;
         public virtual DbSet<Train> Trains { get; set; } = null!;
         public virtual DbSet<TrainRoute> TrainRoutes { get; set; } = null!;
+        public virtual DbSet<Token> Tokens { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

@@ -64,7 +64,8 @@ namespace TicketGo.Infrastructure.Migrations
                     Password = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Sex = table.Column<bool>(type: "bit", nullable: true),
                     DateOfBirth = table.Column<DateTime>(type: "date", nullable: true),
-                    ID_Role = table.Column<int>(type: "int", nullable: false)
+                    ID_Role = table.Column<int>(type: "int", nullable: false),
+                    IsEmailConfirmed = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -114,6 +115,27 @@ namespace TicketGo.Infrastructure.Migrations
                         column: x => x.ID_Account,
                         principalTable: "Account",
                         principalColumn: "ID_Account");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Tokens",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ExpiredAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    AccountId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Tokens", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Tokens_Account_AccountId",
+                        column: x => x.AccountId,
+                        principalTable: "Account",
+                        principalColumn: "ID_Account",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -173,9 +195,9 @@ namespace TicketGo.Infrastructure.Migrations
                 {
                     ID_Seat = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name_Seat = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Name_Seat = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     State = table.Column<bool>(type: "bit", nullable: false),
-                    ID_Coach = table.Column<int>(type: "int", nullable: true)
+                    ID_Coach = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -184,7 +206,8 @@ namespace TicketGo.Infrastructure.Migrations
                         name: "FK_Seat_Coach",
                         column: x => x.ID_Coach,
                         principalTable: "Coach",
-                        principalColumn: "ID_Coach");
+                        principalColumn: "ID_Coach",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -288,6 +311,11 @@ namespace TicketGo.Infrastructure.Migrations
                 column: "ID_Train");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Tokens_AccountId",
+                table: "Tokens",
+                column: "AccountId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Train_ID_TrainRoute",
                 table: "Train",
                 column: "ID_TrainRoute");
@@ -298,6 +326,9 @@ namespace TicketGo.Infrastructure.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Order_Ticket");
+
+            migrationBuilder.DropTable(
+                name: "Tokens");
 
             migrationBuilder.DropTable(
                 name: "Order");

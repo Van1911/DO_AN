@@ -43,6 +43,9 @@ namespace TicketGo.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasColumnName("ID_Role");
 
+                    b.Property<bool>("IsEmailConfirmed")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -244,18 +247,19 @@ namespace TicketGo.Infrastructure.Migrations
 
             modelBuilder.Entity("TicketGo.Domain.Entities.Seat", b =>
                 {
-                    b.Property<int>("IdSeat")
+                    b.Property<int?>("IdSeat")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("ID_Seat");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdSeat"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int?>("IdSeat"));
 
-                    b.Property<int?>("IdCoach")
+                    b.Property<int>("IdCoach")
                         .HasColumnType("int")
                         .HasColumnName("ID_Coach");
 
                     b.Property<string>("NameSeat")
+                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)")
                         .HasColumnName("Name_Seat");
@@ -300,6 +304,31 @@ namespace TicketGo.Infrastructure.Migrations
                     b.HasIndex(new[] { "IdTrain" }, "IX_Ticket_ID_Train");
 
                     b.ToTable("Ticket", (string)null);
+                });
+
+            modelBuilder.Entity("TicketGo.Domain.Entities.Token", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AccountId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
+
+                    b.ToTable("Tokens");
                 });
 
             modelBuilder.Entity("TicketGo.Domain.Entities.Train", b =>
@@ -433,6 +462,8 @@ namespace TicketGo.Infrastructure.Migrations
                     b.HasOne("TicketGo.Domain.Entities.Coach", "IdCoachNavigation")
                         .WithMany("Seats")
                         .HasForeignKey("IdCoach")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("FK_Seat_Coach");
 
                     b.Navigation("IdCoachNavigation");
@@ -457,6 +488,17 @@ namespace TicketGo.Infrastructure.Migrations
                     b.Navigation("IdTrainNavigation");
                 });
 
+            modelBuilder.Entity("TicketGo.Domain.Entities.Token", b =>
+                {
+                    b.HasOne("TicketGo.Domain.Entities.Account", "Account")
+                        .WithMany("Tokens")
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
+                });
+
             modelBuilder.Entity("TicketGo.Domain.Entities.Train", b =>
                 {
                     b.HasOne("TicketGo.Domain.Entities.TrainRoute", "IdTrainRouteNavigation")
@@ -471,6 +513,8 @@ namespace TicketGo.Infrastructure.Migrations
             modelBuilder.Entity("TicketGo.Domain.Entities.Account", b =>
                 {
                     b.Navigation("Customers");
+
+                    b.Navigation("Tokens");
                 });
 
             modelBuilder.Entity("TicketGo.Domain.Entities.Coach", b =>
