@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using TicketGo.Domain.Entities;
 using TicketGo.Domain.Interfaces;
 using TicketGo.Infrastructure.Data;
+using TicketGo.Domain.Common;
 
 namespace TicketGo.Infrastructure.Repositories
 {
@@ -19,31 +20,74 @@ namespace TicketGo.Infrastructure.Repositories
             return await _context.Trains.ToListAsync();
         }
 
-        public async Task<List<Train>> SearchTrainsAsync(string pointStart, string pointEnd, DateTime? departureDate, int page, int pageSize)
+        public async Task<PagedResult<Train>> SearchTrainsAsync(
+            string noiDi,
+            string noiDen,
+            DateTime? ngayKhoiHanh,
+            string sortTime,
+            string sortPrice,
+            List<string> loaiXe,
+            int page,
+            int pageSize)
         {
+            // Truy vấn cơ bản, bao gồm TrainRoute và Coaches
             var query = _context.Trains
                 .Include(t => t.IdTrainRouteNavigation)
+                .Include(t => t.Coaches)
                 .AsQueryable();
 
-            if (!string.IsNullOrEmpty(pointStart))
+            // Áp dụng tiêu chí tìm kiếm
+            if (!string.IsNullOrEmpty(noiDi))
+                query = query.Where(t => t.IdTrainRouteNavigation.PointStart.Contains(noiDi));
+
+            if (!string.IsNullOrEmpty(noiDen))
+                query = query.Where(t => t.IdTrainRouteNavigation.PointEnd.Contains(noiDen));
+
+            if (ngayKhoiHanh.HasValue)
+                query = query.Where(t => t.DateStart.HasValue &&
+                    t.DateStart.Value.Date == ngayKhoiHanh.Value.Date);
+
+            // Áp dụng bộ lọc LoaiXe (Category của Coach)
+            if (loaiXe != null && loaiXe.Any())
             {
-                query = query.Where(t => t.IdTrainRouteNavigation.PointStart.Contains(pointStart));
+                query = query.Where(t => t.Coaches.Any(c => loaiXe.Contains(c.Category)));
             }
 
-            if (!string.IsNullOrEmpty(pointEnd))
+            // Áp dụng bộ lọc SortTime
+            if (!string.IsNullOrEmpty(sortTime))
             {
-                query = query.Where(t => t.IdTrainRouteNavigation.PointEnd.Contains(pointEnd));
+                if (sortTime == "time:asc")
+                    query = query.OrderBy(t => t.DateStart);
+                else if (sortTime == "time:desc")
+                    query = query.OrderByDescending(t => t.DateStart);
             }
 
-            if (departureDate.HasValue)
+            // Áp dụng bộ lọc SortPrice (dựa trên BasicPrice của Coach)
+            if (!string.IsNullOrEmpty(sortPrice))
             {
-                query = query.Where(t => t.DateStart.HasValue && t.DateStart.Value.Date == departureDate.Value.Date);
+                if (sortPrice == "fare:asc")
+                    query = query.OrderBy(t => t.Coaches.Min(c => c.BasicPrice));
+                else if (sortPrice == "fare:desc")
+                    query = query.OrderByDescending(t => t.Coaches.Max(c => c.BasicPrice));
             }
 
-            return await query
+            // Lấy tổng số bản ghi
+            var totalRecords = await query.CountAsync();
+
+            // Áp dụng phân trang
+            var items = await query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
+
+            // Trả về kết quả phân trang
+            return new PagedResult<Train>
+            {
+                Items = items,
+                Page = page,
+                PageSize = pageSize,
+                TotalRecords = totalRecords
+            };
         }
 
         public async Task<Train> GetByIdAsync(int id)

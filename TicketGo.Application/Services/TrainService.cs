@@ -4,14 +4,12 @@ using TicketGo.Domain.Interfaces;
 using TicketGo.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace TicketGo.Application.Services
 {
     public class TrainService : ITrainService
     {
         private readonly ITrainRouteRepository _trainRouteRepository;
         private readonly ITrainRepository _trainRepository;
-        private const int PageSize = 10; // Số lượng bản ghi trên mỗi trang
 
         public TrainService(ITrainRouteRepository trainRouteRepository, ITrainRepository trainRepository)
         {
@@ -31,54 +29,42 @@ namespace TicketGo.Application.Services
 
         public async Task<PagedResult<TrainResponseDto>> SearchTrainsAsync(TrainSearchRequest request)
         {
-            var query = _trainRepository.GetQueryable()
-                .Where(t => t.IdTrainRouteNavigation != null)
-                .AsQueryable(); // ← KHÔNG cần .Where(t => !t.IsDeleted)
+            // Gọi repository với các tham số riêng lẻ
+            var pagedTrains = await _trainRepository.SearchTrainsAsync(
+                noiDi: request.NoiDi,
+                noiDen: request.NoiDen,
+                ngayKhoiHanh: request.NgayKhoiHanh,
+                sortTime: request.SortTime,
+                sortPrice: request.SortPrice,
+                loaiXe: request.LoaiXe ?? new List<string>(),
+                page: request.Page,
+                pageSize: request.PageSize);
 
-            if (!string.IsNullOrWhiteSpace(request.NoiDi))
-                query = query.Where(t => t.IdTrainRouteNavigation.PointStart.Contains(request.NoiDi));
-
-            if (!string.IsNullOrWhiteSpace(request.NoiDen))
-                query = query.Where(t => t.IdTrainRouteNavigation.PointEnd.Contains(request.NoiDen));
-
-            if (request.NgayKhoiHanh.HasValue)
-                query = query.Where(t => t.DateStart.HasValue && t.DateStart.Value.Date == request.NgayKhoiHanh.Value.Date);
-
-            query = request.Sort switch
+            // Ánh xạ Train sang TrainResponseDto, xử lý null
+            var trainDtos = pagedTrains.Items.Select(train =>
             {
-                "fare:asc" => query.OrderBy(t => t.CoefficientTrain),
-                "fare:desc" => query.OrderByDescending(t => t.CoefficientTrain),
-                "time:asc" => query.OrderBy(t => t.DateStart),
-                "time:desc" => query.OrderByDescending(t => t.DateStart),
-                _ => query.OrderBy(t => t.IdTrain)
-            };
-
-            var totalRecords = await query.CountAsync();
-
-            var items = await query
-                .Skip((request.Page - 1) * request.PageSize)
-                .Take(request.PageSize)
-                .Select(t => new TrainResponseDto
+                var coach = train.Coaches.FirstOrDefault(c => request.LoaiXe.Count == 0 || request.LoaiXe.Contains(c.Category));
+                return new TrainResponseDto
                 {
-                    Id = t.IdTrain,
-                    TenTau = t.NameTrain,
-                    NoiDi = t.IdTrainRouteNavigation.PointStart,
-                    NoiDen = t.IdTrainRouteNavigation.PointEnd,
-                    GioKhoiHanh = t.DateStart ?? DateTime.MinValue,
-                    GiaVe = (t.CoefficientTrain ?? 1) * 100000
-                })
-                .ToListAsync();
+                    Id = train.IdTrain,
+                    TenTau = train.NameTrain ?? "N/A",
+                    NoiDi = train.IdTrainRouteNavigation?.PointStart ?? "N/A",
+                    NoiDen = train.IdTrainRouteNavigation?.PointEnd ?? "N/A",
+                    GioKhoiHanh = train.DateStart.HasValue ? train.DateStart.Value : default(DateTime),
+                    GiaVe = coach != null ? (decimal?)coach.BasicPrice : null,
+                    LoaiXe = coach?.Category ?? "N/A"
+                };
+            }).ToList();
 
+            // Trả về kết quả phân trang
             return new PagedResult<TrainResponseDto>
             {
-                Items = items,
-                TotalRecords = totalRecords,
-                Page = request.Page,
-                PageSize = request.PageSize
+                Items = trainDtos,
+                Page = pagedTrains.Page,
+                PageSize = pagedTrains.PageSize,
+                TotalRecords = pagedTrains.TotalRecords
             };
         }
-
-
 
         public async Task<List<TrainDto>> GetAllTrainsAsync()
         {
@@ -89,9 +75,9 @@ namespace TicketGo.Application.Services
                 NameTrain = t.NameTrain,
                 DateStart = t.DateStart,
                 IdTrainRoute = t.IdTrainRoute,
-                TrainRouteName = t.IdTrainRouteNavigation != null 
-                    ? $"{t.IdTrainRouteNavigation.PointStart} - {t.IdTrainRouteNavigation.PointEnd}" 
-                    : null,
+                TrainRouteName = t.IdTrainRouteNavigation != null
+                    ? $"{t.IdTrainRouteNavigation.PointStart} - {t.IdTrainRouteNavigation.PointEnd}"
+                    : "N/A",
                 CoefficientTrain = (double?)t.CoefficientTrain
             }).ToList();
         }
@@ -110,10 +96,10 @@ namespace TicketGo.Application.Services
                 NameTrain = train.NameTrain,
                 DateStart = train.DateStart,
                 IdTrainRoute = train.IdTrainRoute,
-                TrainRouteName = train.IdTrainRouteNavigation != null 
-                    ? $"{train.IdTrainRouteNavigation.PointStart} - {train.IdTrainRouteNavigation.PointEnd}" 
-                    : null,
-                CoefficientTrain =  (double?)train.CoefficientTrain
+                TrainRouteName = train.IdTrainRouteNavigation != null
+                    ? $"{train.IdTrainRouteNavigation.PointStart} - {train.IdTrainRouteNavigation.PointEnd}"
+                    : "N/A",
+                CoefficientTrain = (double?)train.CoefficientTrain
             };
         }
 
@@ -124,7 +110,7 @@ namespace TicketGo.Application.Services
                 NameTrain = trainDto.NameTrain,
                 DateStart = trainDto.DateStart,
                 IdTrainRoute = trainDto.IdTrainRoute,
-                CoefficientTrain =  (decimal?)trainDto.CoefficientTrain
+                CoefficientTrain = (decimal?)trainDto.CoefficientTrain
             };
 
             await _trainRepository.AddAsync(train);
@@ -141,7 +127,7 @@ namespace TicketGo.Application.Services
             train.NameTrain = trainDto.NameTrain;
             train.DateStart = trainDto.DateStart;
             train.IdTrainRoute = trainDto.IdTrainRoute;
-            train.CoefficientTrain =  (decimal?)trainDto.CoefficientTrain;
+            train.CoefficientTrain = (decimal?)trainDto.CoefficientTrain;
 
             await _trainRepository.UpdateAsync(train);
         }
