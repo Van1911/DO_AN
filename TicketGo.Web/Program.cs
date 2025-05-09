@@ -5,6 +5,7 @@ using TicketGo.Domain.Interfaces;
 using TicketGo.Infrastructure.Data;
 using TicketGo.Infrastructure.Repositories;
 using TicketGo.Web.Middleware;
+using Resend;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -47,12 +48,23 @@ builder.Services.AddScoped<ICoachService, CoachService>();
 builder.Services.AddScoped<ITrainRouteService, TrainRouteService>();
 builder.Services.AddScoped<IDiscountService, DiscountService>();
 builder.Services.AddScoped<ISeatService, SeatService>();
+builder.Services.AddScoped<IResendService, ResendService>();
 
 builder.Services.AddScoped<IEmailSender, EmailSender>();
 builder.Services.AddScoped<IVNPayService, VNPayService>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+//Resend 
 
+builder.Services.AddOptions();
+builder.Services.AddHttpClient<ResendClient>();
+builder.Services.Configure<ResendClientOptions>( o =>
+{
+    o.ApiToken ="re_NzRQ5Ptb_3V25XUff9ueWmDTLaGF5NQJB";
+} );
+builder.Services.AddTransient<IResend, ResendClient>();
+
+// Add AutoMapper
 builder.Services.AddHttpContextAccessor();
 
 // Cookie Authentication
