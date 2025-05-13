@@ -31,6 +31,7 @@
                         <th class="p-4 text-sm font-bold text-lime-400 cursor-pointer"><div class="flex items-center hover:font-extrabold">Email</div></th>
                         <th class="p-4 text-sm font-bold text-lime-400 cursor-pointer"><div class="flex items-center hover:font-extrabold">Giới Tính</div></th>
                         <th class="p-4 text-sm font-bold text-lime-400 cursor-pointer"><div class="flex items-center hover:font-extrabold">Ngày Sinh</div></th>
+                        <th class="p-4 text-sm font-bold text-lime-400 cursor-pointer"><div class="flex items-center hover:font-extrabold">Xác thực</div></th>
                         <th class="p-4 text-sm font-bold text-lime-400 cursor-pointer"><div class="flex items-center hover:font-extrabold">Vai Trò</div></th>
                         <th class="p-4 text-sm font-bold text-lime-400"></th>
                     </tr>
@@ -42,8 +43,9 @@
                             <td class="p-4 text-sm text-gray-700 dark:text-white">@{ i++; } @i</td>
                             <td class="p-4 text-sm text-gray-700 dark:text-white">@Html.DisplayFor(modelItem => item.Phone)</td>
                             <td class="p-4 text-sm text-gray-700 dark:text-white">@Html.DisplayFor(modelItem => item.Email)</td>
-                            <td class="p-4 text-sm text-gray-700 dark:text-white">@((bool)item.Sex ? "Nữ" : "Nam")</td>
-                            <td class="p-4 text-sm text-gray-700 dark:text-white">@(item.DateOfBirth.HasValue ? item.DateOfBirth.Value.ToString("dd-MM-yyyy") : "")</td>
+                            <td class="p-4 text-sm text-gray-700 dark:text-white">@(item.Sex == true ? "Nam" : item.Sex == false ? "Nữ" : "")</td>
+                            <td class="p-4 text-sm text-gray-700 dark:text-white">@item.DateOfBirth?.ToString("dd-MM-yyyy")</td>
+                            <td class="p-4 text-sm text-gray-700 dark:text-white">@(item.IsEmailConfirmed == true ? "Đã xác thực":item.IsEmailConfirmed == false ? "Chưa xác thực": "Không xác định") </td>
                             <td class="p-4 text-sm text-gray-700 dark:text-white">@Html.DisplayFor(modelItem => item.RoleName)</td>
                             <td class="p-4 flex space-x-2">
                                 <button class="edit-btn flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-lime-400 dark:hover:text-lime-400 w-8 h-8 rounded-full hover:bg-navy-600" 
