@@ -1,33 +1,80 @@
-## 1. Cài đặt các công cụ cần thiết
-.NET SDK 8
-IDE: Visual Studio Code + C# extension
-Git
-SQL Server
+# TicketGo – Hệ thống đặt vé xe
 
-## 2. Clone project về
-https://github.com/Van1911/DO_AN.git
+## 1. Yêu cầu hệ thống
 
-## 3. Kiểm tra file cấu hình
-Mở file appsettings.json và/hoặc appsettings.Development.json để kiểm tra:
+Trước khi bắt đầu, bạn cần cài đặt các công cụ sau:
 
-Chuỗi kết nối database (ConnectionStrings)
-    Data Source={YOURSERVERNAME};Initial Catalog=TicketGoV2;Integrated Security=True;Encrypt=False
-->Sau có dán vào ConnectionStrings ở trong file appsettings.json
+- [.NET SDK 8.0](https://dotnet.microsoft.com/en-us/download)
+- [Visual Studio Code](https://code.visualstudio.com/) + [C# Extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp)
+- [Git](https://git-scm.com/downloads)
+- [SQL Server](https://www.microsoft.com/en-us/sql-server/sql-server-downloads)
 
-## 4. Khôi phục gói NuGet
+---
+
+## 2. Clone dự án
+
+```bash
+git clone https://github.com/Van1911/DO_AN.git
+cd TicketGo
+```
+---
+
+## 3. Cấu hình chuỗi kết nối
+Mở file appsettings.json hoặc appsettings.Development.json trong thư mục TicketGo.Web và cập nhật chuỗi kết nối:
+
+```bash
+"ConnectionStrings": 
+    {
+    "DefaultConnection": "Data Source={YOURSERVERNAME};Initial Catalog=TicketGoV2;Integrated Security=True;Encrypt=False"
+    }
+```
+Thay {YOURSERVERNAME} bằng tên server SQL Server của bạn (ví dụ: localhost, .\SQLEXPRESS, v.v.).
+
+
+---
+
+## 4. Khôi phục các gói NuGet
+Chạy lệnh sau ở thư mục gốc dự án:
+```bash
 dotnet restore
+```
 
-## 5. (Tuỳ chọn) Cấu hình DB – Migration
-Kiểm tra file DbContext và thư mục Migrations
-Nếu có sẵn migration:
-    dotnet ef database update
+---
 
-Nếu chưa có migration hoặc muốn tạo mới:
-    dotnet ef migrations add InitialCreate
-    dotnet ef database update
+## 5. Cấu hình cơ sở dữ liệu
+➤ Trường hợp đã có migration:
 
-## 6. Chạy project
-    cd .\TicketGo.Web\
-    dotnet run
- or
-    F5
+```bash
+dotnet ef database update
+```
+
+➤ Trường hợp chưa có migration hoặc muốn tạo mới:
+
+```bash
+dotnet ef migrations add InitialCreate
+dotnet ef database update
+```
+
+📌 Đảm bảo EF Core CLI đã được cài đặt:
+
+```bash
+dotnet tool install --global dotnet-ef
+```
+
+## 6. Chạy ứng dụng
+Di chuyển vào thư mục web:
+
+```bash
+cd TicketGo.Web
+dotnet run
+```
+Hoặc nhấn F5 trong Visual Studio Code để chạy ứng dụng với debugger.
+
+## 📂 Cấu trúc chính của dự án
+TicketGo/
+│
+├── TicketGo.Application      # Lớp ứng dụng - chứa logic nghiệp vụ
+├── TicketGo.Domain           # Lớp domain - các thực thể và interface
+├── TicketGo.Infrastructure   # Kết nối DB, repo, cấu hình DI
+├── TicketGo.Web              # Giao diện người dùng (ASP.NET Core Razor Pages)
+└── TicketGo.Tests            # Các bài test (nếu có)
