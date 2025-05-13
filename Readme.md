@@ -71,10 +71,13 @@ dotnet run
 Hoặc nhấn F5 trong Visual Studio Code để chạy ứng dụng với debugger.
 
 ## 📂 Cấu trúc chính của dự án
+```bash
 TicketGo/
 │
 ├── TicketGo.Application      # Lớp ứng dụng - chứa logic nghiệp vụ
 ├── TicketGo.Domain           # Lớp domain - các thực thể và interface
 ├── TicketGo.Infrastructure   # Kết nối DB, repo, cấu hình DI
 └── TicketGo.Web              # Giao diện người dùng (ASP.NET Core Razor Pages)
+```
+
 
