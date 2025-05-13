@@ -15,6 +15,9 @@ namespace TicketGo.Application.DTOs
         public DateTime? DateOfBirth { get; set; }
         public int IdRole { get; set; } = 2; // Mặc định là 2 (khách hàng)
         public string RoleName { get; set; } // Tên vai trò (từ IdRoleNavigation)
+
+        public bool? IsEmailConfirmed { get; set; }
+        
     }
 
     // [Tạo tài khoản mới]

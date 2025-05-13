@@ -12,7 +12,7 @@ using TicketGo.Infrastructure.Data;
 namespace TicketGo.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250508122512_InitialCreate")]
+    [Migration("20250512112924_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -48,6 +48,9 @@ namespace TicketGo.Infrastructure.Migrations
 
                     b.Property<bool>("IsEmailConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Password")
                         .IsRequired()
@@ -102,31 +105,6 @@ namespace TicketGo.Infrastructure.Migrations
                     b.HasIndex("IdTrain");
 
                     b.ToTable("Coach", (string)null);
-                });
-
-            modelBuilder.Entity("TicketGo.Domain.Entities.Customer", b =>
-                {
-                    b.Property<int>("IdCus")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("ID_Cus");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdCus"));
-
-                    b.Property<string>("FullName")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("Full_Name");
-
-                    b.Property<int>("IdAccount")
-                        .HasColumnType("int")
-                        .HasColumnName("ID_Account");
-
-                    b.HasKey("IdCus");
-
-                    b.HasIndex(new[] { "IdAccount" }, "IX_Customer_ID_Account");
-
-                    b.ToTable("Customer", (string)null);
                 });
 
             modelBuilder.Entity("TicketGo.Domain.Entities.Discount", b =>
@@ -413,30 +391,19 @@ namespace TicketGo.Infrastructure.Migrations
                     b.Navigation("IdTrainNavigation");
                 });
 
-            modelBuilder.Entity("TicketGo.Domain.Entities.Customer", b =>
-                {
-                    b.HasOne("TicketGo.Domain.Entities.Account", "IdAccountNavigation")
-                        .WithMany("Customers")
-                        .HasForeignKey("IdAccount")
-                        .IsRequired()
-                        .HasConstraintName("FK_Customer_Account");
-
-                    b.Navigation("IdAccountNavigation");
-                });
-
             modelBuilder.Entity("TicketGo.Domain.Entities.Order", b =>
                 {
-                    b.HasOne("TicketGo.Domain.Entities.Customer", "IdCusNavigation")
+                    b.HasOne("TicketGo.Domain.Entities.Account", "IdAccountNavigation")
                         .WithMany("Orders")
                         .HasForeignKey("IdCus")
-                        .HasConstraintName("FK_Order_Customer");
+                        .HasConstraintName("FK_Order_Account");
 
                     b.HasOne("TicketGo.Domain.Entities.Discount", "IdDiscountNavigation")
                         .WithMany("Orders")
                         .HasForeignKey("IdDiscount")
                         .HasConstraintName("FK_Order_Discount");
 
-                    b.Navigation("IdCusNavigation");
+                    b.Navigation("IdAccountNavigation");
 
                     b.Navigation("IdDiscountNavigation");
                 });
@@ -515,7 +482,7 @@ namespace TicketGo.Infrastructure.Migrations
 
             modelBuilder.Entity("TicketGo.Domain.Entities.Account", b =>
                 {
-                    b.Navigation("Customers");
+                    b.Navigation("Orders");
 
                     b.Navigation("Tokens");
                 });
@@ -523,11 +490,6 @@ namespace TicketGo.Infrastructure.Migrations
             modelBuilder.Entity("TicketGo.Domain.Entities.Coach", b =>
                 {
                     b.Navigation("Seats");
-                });
-
-            modelBuilder.Entity("TicketGo.Domain.Entities.Customer", b =>
-                {
-                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("TicketGo.Domain.Entities.Discount", b =>

@@ -12,7 +12,6 @@ namespace TicketGo.Infrastructure.Data
 
         public virtual DbSet<Account> Accounts { get; set; } = null!;
         public virtual DbSet<Coach> Coaches { get; set; } = null!;
-        public virtual DbSet<Customer> Customers { get; set; } = null!;
         public virtual DbSet<Discount> Discounts { get; set; } = null!;
         public virtual DbSet<Order> Orders { get; set; } = null!;
         public virtual DbSet<OrderTicket> OrderTickets { get; set; } = null!;
@@ -100,28 +99,28 @@ namespace TicketGo.Infrastructure.Data
                     .HasConstraintName("FK_Coach_Train");
             });
 
-            modelBuilder.Entity<Customer>(entity =>
-            {
-                entity.HasKey(e => e.IdCus);
+            // modelBuilder.Entity<Customer>(entity =>
+            // {
+            //     entity.HasKey(e => e.IdCus);
 
-                entity.ToTable("Customer");
+            //     entity.ToTable("Customer");
 
-                entity.HasIndex(e => e.IdAccount, "IX_Customer_ID_Account");
+            //     entity.HasIndex(e => e.IdAccount, "IX_Customer_ID_Account");
 
-                entity.Property(e => e.IdCus).HasColumnName("ID_Cus");
+            //     entity.Property(e => e.IdCus).HasColumnName("ID_Cus");
 
-                entity.Property(e => e.FullName)
-                    .HasMaxLength(50)
-                    .HasColumnName("Full_Name");
+            //     entity.Property(e => e.FullName)
+            //         .HasMaxLength(50)
+            //         .HasColumnName("Full_Name");
 
-                entity.Property(e => e.IdAccount).HasColumnName("ID_Account");
+            //     entity.Property(e => e.IdAccount).HasColumnName("ID_Account");
 
-                entity.HasOne(d => d.IdAccountNavigation)
-                    .WithMany(p => p.Customers)
-                    .HasForeignKey(d => d.IdAccount)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Customer_Account");
-            });
+            //     entity.HasOne(d => d.IdAccountNavigation)
+            //         .WithMany(p => p.Customers)
+            //         .HasForeignKey(d => d.IdAccount)
+            //         .OnDelete(DeleteBehavior.ClientSetNull)
+            //         .HasConstraintName("FK_Customer_Account");
+            // });
 
             modelBuilder.Entity<Discount>(entity =>
             {
@@ -164,10 +163,10 @@ namespace TicketGo.Infrastructure.Data
 
                 entity.Property(e => e.UnitPrice).HasColumnName("Unit_Price");
 
-                entity.HasOne(d => d.IdCusNavigation)
+                entity.HasOne(d => d.IdAccountNavigation)
                     .WithMany(p => p.Orders)
                     .HasForeignKey(d => d.IdCus)
-                    .HasConstraintName("FK_Order_Customer");
+                    .HasConstraintName("FK_Order_Account");
 
                 entity.HasOne(d => d.IdDiscountNavigation)
                     .WithMany(p => p.Orders)

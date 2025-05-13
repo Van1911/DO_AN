@@ -33,7 +33,7 @@ namespace TicketGo.Web.Controllers
         {
             // Kiểm tra email đã tồn tại
             var existingAccount = await _accountService.GetAllAccountsAsync();
-            if (existingAccount.Any(a => a.Email == registerDto.Email))
+            if (existingAccount.Any(a => a.Email == registerDto.Email) && existingAccount.Any(a => a.IsEmailConfirmed == true))
             {
                 ModelState.AddModelError("Email", "Email đã tồn tại.");
                 return View(registerDto);
@@ -58,7 +58,7 @@ namespace TicketGo.Web.Controllers
                 {
                     // Tạo và gửi email xác thực
                     var token = await _accountService.GenerateTokenAsync(account);
-                    var verifyUrl = Url.Action("VerifyEmail", "Account", new { email = account.Email, token }, protocol: Request.Scheme);
+                    var verifyUrl = Url.Action("VerifyEmail", "Access", new { email = account.Email, token }, protocol: Request.Scheme);
                     await _resendService.SendVerificationEmailAsync(registerDto.Email, verifyUrl);
                     TempData["SuccessMessage"] = "Đăng ký thành công! Vui lòng kiểm tra email để xác minh tài khoản.";
                     return RedirectToAction("Login");
@@ -103,7 +103,7 @@ namespace TicketGo.Web.Controllers
 
                 // Thiết lập session
                 HttpContext.Session.SetString("UserSession", myUser.Email);
-                HttpContext.Session.SetInt32("UserID", myUser.IdAccount);
+                HttpContext.Session.SetInt32("AccountID", myUser.IdAccount);
 
                 if (myUser.IdRole == 1)
                 {
@@ -132,11 +132,11 @@ namespace TicketGo.Web.Controllers
             var success = await _accountService.VerifyEmailAsync(email, token);
             if (success)
             {
-                TempData["SuccessMessage"] = "Xác thực email thành công! Bạn có thể đăng nhập ngay bây giờ.";
+                TempData["SuccessMessage"] = "Xác thực email thành công! Bạn đã có thể đăng nhập.";
             }
             else
             {
-                TempData["ErrorMessage"] = "Xác thực email thất bại. Liên kết không hợp lệ hoặc đã hết hạn.";
+                TempData["ErrorMessage"] = "Xác thực email thất bại. Liên kết không hợp lệ hoặc hết hạn.";
             }
 
             return RedirectToAction("Login");
@@ -150,5 +150,6 @@ namespace TicketGo.Web.Controllers
             HttpContext.Session.Clear();
             return RedirectToAction("Login");
         }
+        
     }
 }

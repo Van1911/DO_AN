@@ -10,13 +10,11 @@ namespace TicketGo.Application.Services
     public class AccountService : IAccountService
     {
         private readonly IAccountRepository _accountRepository;
-        private readonly ICustomerRepository _customerRepository;
         private readonly IRoleRepository _roleRepository;
 
-        public AccountService(IAccountRepository accountRepository, ICustomerRepository customerRepository, IRoleRepository roleRepository)
+        public AccountService(IAccountRepository accountRepository,   IRoleRepository roleRepository)
         {
             _accountRepository = accountRepository;
-            _customerRepository = customerRepository;
             _roleRepository = roleRepository;
         }
 
@@ -26,6 +24,7 @@ namespace TicketGo.Application.Services
             // Tạo tài khoản mới
             var newAccount = new Account // Changed from AccountDto to Account
             {
+                Name = registerDto.Fullname,
                 Email = registerDto.Email,
                 Password = registerDto.Password,
                 Phone = registerDto.Phone,
@@ -36,16 +35,6 @@ namespace TicketGo.Application.Services
 
             // Lưu tài khoản
             await _accountRepository.AddAsync(newAccount);
-
-            // Tạo khách hàng mới liên kết với tài khoản
-            var newCustomer = new Customer
-            {
-                IdAccount = newAccount.IdAccount,
-                FullName = registerDto.Fullname
-            };
-
-            // Lưu khách hàng
-            await _customerRepository.AddAsync(newCustomer);
             return true;
         }
         //[Đăng nhập tài khoản]
@@ -110,7 +99,8 @@ namespace TicketGo.Application.Services
                 Sex = a.Sex,
                 DateOfBirth = a.DateOfBirth,
                 IdRole = a.IdRole,
-                RoleName = a.IdRoleNavigation?.Name
+                RoleName = a.IdRoleNavigation?.Name,
+                IsEmailConfirmed = a.IsEmailConfirmed
             }).ToList();
         }
 

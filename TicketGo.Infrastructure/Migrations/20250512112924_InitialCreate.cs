@@ -60,6 +60,7 @@ namespace TicketGo.Infrastructure.Migrations
                     ID_Account = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Phone = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Email = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Password = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Sex = table.Column<bool>(type: "bit", nullable: true),
@@ -99,22 +100,32 @@ namespace TicketGo.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Customer",
+                name: "Order",
                 columns: table => new
                 {
-                    ID_Cus = table.Column<int>(type: "int", nullable: false)
+                    ID_Order = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Full_Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    ID_Account = table.Column<int>(type: "int", nullable: false)
+                    Unit_Price = table.Column<double>(type: "float", nullable: true),
+                    Date_Order = table.Column<DateTime>(type: "datetime", nullable: true),
+                    ID_Ticket = table.Column<int>(type: "int", nullable: false),
+                    ID_Discount = table.Column<int>(type: "int", nullable: true),
+                    NameCus = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Phone = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    ID_Cus = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Customer", x => x.ID_Cus);
+                    table.PrimaryKey("PK_Order", x => x.ID_Order);
                     table.ForeignKey(
-                        name: "FK_Customer_Account",
-                        column: x => x.ID_Account,
+                        name: "FK_Order_Account",
+                        column: x => x.ID_Cus,
                         principalTable: "Account",
                         principalColumn: "ID_Account");
+                    table.ForeignKey(
+                        name: "FK_Order_Discount",
+                        column: x => x.ID_Discount,
+                        principalTable: "Discount",
+                        principalColumn: "ID_Discount");
                 });
 
             migrationBuilder.CreateTable(
@@ -158,35 +169,6 @@ namespace TicketGo.Infrastructure.Migrations
                         column: x => x.ID_Train,
                         principalTable: "Train",
                         principalColumn: "ID_Train");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Order",
-                columns: table => new
-                {
-                    ID_Order = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Unit_Price = table.Column<double>(type: "float", nullable: true),
-                    Date_Order = table.Column<DateTime>(type: "datetime", nullable: true),
-                    ID_Ticket = table.Column<int>(type: "int", nullable: false),
-                    ID_Discount = table.Column<int>(type: "int", nullable: true),
-                    NameCus = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Phone = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
-                    ID_Cus = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Order", x => x.ID_Order);
-                    table.ForeignKey(
-                        name: "FK_Order_Customer",
-                        column: x => x.ID_Cus,
-                        principalTable: "Customer",
-                        principalColumn: "ID_Cus");
-                    table.ForeignKey(
-                        name: "FK_Order_Discount",
-                        column: x => x.ID_Discount,
-                        principalTable: "Discount",
-                        principalColumn: "ID_Discount");
                 });
 
             migrationBuilder.CreateTable(
@@ -271,11 +253,6 @@ namespace TicketGo.Infrastructure.Migrations
                 column: "ID_Train");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Customer_ID_Account",
-                table: "Customer",
-                column: "ID_Account");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Order_ID_Cus",
                 table: "Order",
                 column: "ID_Cus");
@@ -337,7 +314,7 @@ namespace TicketGo.Infrastructure.Migrations
                 name: "Ticket");
 
             migrationBuilder.DropTable(
-                name: "Customer");
+                name: "Account");
 
             migrationBuilder.DropTable(
                 name: "Discount");
@@ -346,13 +323,10 @@ namespace TicketGo.Infrastructure.Migrations
                 name: "Seat");
 
             migrationBuilder.DropTable(
-                name: "Account");
+                name: "Role");
 
             migrationBuilder.DropTable(
                 name: "Coach");
-
-            migrationBuilder.DropTable(
-                name: "Role");
 
             migrationBuilder.DropTable(
                 name: "Train");

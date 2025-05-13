@@ -7,11 +7,12 @@ namespace TicketGo.Domain.Entities
     {
         public Account()
         {
-            Customers = new HashSet<Customer>();
+            Orders = new HashSet<Order>();
         }
 
         public int IdAccount { get; set; }
         public string? Phone { get; set; }
+        public string? Name { get; set; }
         public string Email { get; set; } = null!;
         public string Password { get; set; } = null!;
         public bool? Sex { get; set; }
@@ -21,8 +22,9 @@ namespace TicketGo.Domain.Entities
 
 
         public virtual Role IdRoleNavigation { get; set; } = null!;
-        public virtual ICollection<Customer> Customers { get; set; }
         public virtual ICollection<Token> Tokens { get; set; }
+         public virtual ICollection<Order> Orders { get; set; }
+
 
     }
 }
