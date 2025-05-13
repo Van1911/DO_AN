@@ -1,10 +1,8 @@
 ﻿@model TicketGo.Application.DTOs.OrderTicketDto
 
-
 @{
-    Layout = "Master_layout";
+    ViewData["Title"] = "Đặt Vé Xe Khách";
 }
-
 
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 @{
@@ -13,320 +11,142 @@
     var ID = httpContext.Session.GetInt32("UserID");
 }
 
+<div class="flex justify-center bg-gray-100 dark:bg-gray-900 p-4 min-h-screen">
+    <div class="w-full max-w-7xl flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
+        <!-- Header -->
+        <div class="flex-shrink-0 p-6 border-b border-gray-200 dark:border-gray-700">
+            <h1 class="text-2xl font-bold text-gray-800 dark:text-white text-center">Đặt Vé Xe Khách</h1>
+        </div>
 
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đặt Vé Xe Khách</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .card-header {
-            font-size: 1.25rem;
-            font-weight: bold;
-        }
-
-        .card-body {
-            font-size: 0.875rem;
-            color: #495057; /* Màu chữ */
-        }
-
-            .card-body p {
-                margin-bottom: 0.5rem;
-            }
-
-        .selected-seats {
-            margin-top: 1rem;
-        }
-
-            .selected-seats .seat-tag {
-                display: inline-block;
-                background-color: #0d6efd;
-                color: #fff;
-                padding: 0.25rem 0.5rem;
-                margin-right: 5px;
-                margin-bottom: 5px;
-                border-radius: 5px;
-                cursor: pointer;
-                transition: background-color 0.3s ease;
-            }
-
-                .selected-seats .seat-tag:hover {
-                    background-color: #0056b3;
-                }
-
-
-        .form-label span {
-            color: #EB5757;
-        }
-
-        .seat-selection {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .seat {
-            width: 50px;
-            height: 50px;
-            background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-            margin-bottom: 8px;
-            text-align: center;
-            line-height: 50px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-            .seat.selected {
-                background-color: #0d6efd;
-                color: #fff;
-            }
-
-            .seat.occupied {
-                background-color: #6c757d;
-                color: #fff;
-                cursor: not-allowed;
-            }
-
-        .selected-seats {
-            margin-top: 20px;
-        }
-
-            .selected-seats .seat-tag {
-                display: inline-block;
-                background-color: #0d6efd;
-                color: #fff;
-                padding: 5px 10px;
-                margin: 5px;
-                border-radius: 5px;
-                cursor: pointer;
-                transition: background-color 0.3s ease;
-            }
-
-
-                .selected-seats .seat-tag:hover {
-                    background-color: #0056b3;
-                }
-
-        .seat-info {
-            display: flex;
-            align-items: center; /* Căn giữa các phần tử con theo chiều dọc */
-            margin-bottom: 10px;
-        }
-
-        .note {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-            font-size: 13px;
-            font-weight: bold
-        }
-
-        .seat-group {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 10px;
-        }
-
-        .seat-thumbnail {
-            width: 40px;
-            height: 40px;
-            display: inline-block;
-            margin-right: 8px;
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-        }
-
-
-            .seat-thumbnail.occupied {
-                background-color: #6c757d;
-                color: #fff;
-            }
-
-            .seat-thumbnail.selected {
-                background-color: #0d6efd;
-                color: #fff;
-            }
-
-            .seat-thumbnail.empty {
-                background-color: #f8f9fa;
-                color: #dee2e6;
-            }
-
-        .seat-name {
-            display: inline-block;
-            vertical-align: middle;
-            flex: 1; /* Đảm bảo rằng tên ghế sẽ căn giữa theo chiều dọc */
-        }
-
-        .clear-selection {
-            display: block;
-            text-align: right;
-            cursor: pointer;
-            color: #0d6efd;
-            text-decoration: underline;
-            margin: 10px 40px 10px 0;
-        }
-
-        #personal-info-form {
-            margin-top: 0em;
-            unicode-bidi: isolate;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .mb-3 {
-            width: 100%
-        }
-
-    </style>
-</head>
-
-<body>
-    <div class="container mt-5">
-        <h1 class="text-center">Đặt Vé Xe Khách</h1>
-        <br>
-
-        <div class="row">
-            <!-- Chọn chỗ ngồi -->
-            <div class="col-md-5">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        Chọn chỗ ngồi
-                    </div>
-                    <div class="card-body">
-                        <div class="mt-3">
-                            <span class="clear-selection" style="cursor:pointer " onclick="clearAllSelections()">Xóa tất cả ghế đã chọn</span>
+        <!-- Main Content -->
+        <div class="flex-1 p-6">
+            <div class="grid grid-cols-7 gap-4">
+                <!-- Seat Selection -->
+                <div class="col-span-3">
+                    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-lg">
+                        <h2 class="text-lg font-bold text-gray-800 dark:text-white mb-4">Chọn Chỗ Ngồi</h2>
+                        <div class="flex justify-end mb-4">
+                            <span class="text-sm text-lime-400 cursor-pointer hover:underline" onclick="clearAllSelections()">Xóa tất cả ghế đã chọn</span>
                         </div>
-                        <div class="row">
-                            <!-- Chú thích ghế -->
-                            <div class="col-md-4">
-                                <div class="note">Chú thích</div>
-                                <div class="seat-info">
-                                    <div class="seat-thumbnail occupied"></div>
-                                    <span class="seat-name">Ghế đã đặt</span>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- Seat Notes -->
+                            <div>
+                                <p class="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Chú thích</p>
+                                <div class="flex items-center mb-2">
+                                    <div class="w-8 h-8 rounded-md bg-gray-500 mr-2"></div>
+                                    <span class="text-sm text-gray-700 dark:text-white">Ghế đã đặt</span>
                                 </div>
-                                <div class="seat-info">
-                                    <div class="seat-thumbnail empty"></div>
-                                    <span class="seat-name">Ghế trống</span>
+                                <div class="flex items-center mb-2">
+                                    <div class="w-8 h-8 rounded-md bg-gray-200 dark:bg-gray-600 mr-2"></div>
+                                    <span class="text-sm text-gray-700 dark:text-white">Ghế trống</span>
                                 </div>
-                                <div class="seat-info">
-                                    <div class="seat-thumbnail selected"></div>
-                                    <span class="seat-name">Ghế đang chọn</span>
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 rounded-md bg-lime-400 mr-2"></div>
+                                    <span class="text-sm text-gray-700 dark:text-white">Ghế đang chọn</span>
                                 </div>
                             </div>
-
-                            <!-- Phần chọn ghế -->
-                            <div class="col-md-8">
-
-                                <div id="seat-selection" class="seat-selection">
-                                    <!-- Seats will be generated here by JavaScript -->
-                                </div>
+                            <!-- Seat Grid -->
+                            <div>
+                                <div id="seat-selection" class="grid grid-cols-4 gap-2"></div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <!-- Thông tin cá nhân -->
-            <div class="col-md-4">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        Thông tin liên hệ
-                    </div>
-                    <div class="card-body">
+
+                <!-- Personal Information -->
+                <div class="col-span-2 col-start-4">
+                    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-lg">
+                        <h2 class="text-lg font-bold text-gray-800 dark:text-white mb-4">Thông Tin Liên Hệ</h2>
                         <form id="personal-info-form" method="post" action="/Order/Index">
-                            <!-- Các trường thông tin cá nhân -->
-                            <div class="mb-3">
-                                <label for="userName" class="form-label">Tên người đi <span>*</span></label>
-                                <input type="text" class="form-control" id="userName" name="Fullname" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="phone" class="form-label">Số điện thoại <span>*</span></label>
-                                <div class="input-group">
-                                    <span class="input-group-text">🇻🇳 +84</span>
-                                    <input type="tel" class="form-control" id="phone" name="Phone" required>
+                            @Html.AntiForgeryToken()
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" for="userName">Tên Người Đi <span class="text-lime-400">*</span></label>
+                                <div class="relative">
+                                    <input type="text" id="userName" name="Fullname" class="w-full pt-3 pb-3 pr-3 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-lime-400" required placeholder="Nhập tên người đi" />
+                                    <svg class="absolute left-3 top-1/3 -translate-y-1/2 w-5 h-5 text-lime-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                    </svg>
                                 </div>
+                                <p id="userNameError" class="text-sm text-lime-400 mt-1 hidden"></p>
                             </div>
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email để nhận thông tin đặt chỗ <span>*</span></label>
-                                <input type="email" class="form-control" id="email" name="Email" required>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" for="phone">Số Điện Thoại <span class="text-lime-400">*</span></label>
+                                <div class="relative">
+                                    <input type="tel" id="phone" name="Phone" class="w-full pt-3 pb-3 pr-3 pl-16 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-lime-400" required placeholder="Nhập số điện thoại" />
+                                    <span class="absolute left-3 top-1/3 -translate-y-1/2 text-sm text-gray-700 dark:text-gray-300">🇻🇳 +84</span>
+                                </div>
+                                <p id="phoneError" class="text-sm text-lime-400 mt-1 hidden"></p>
                             </div>
-                            <div class="alert alert-info mt-3" role="alert">
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" for="email">Email <span class="text-lime-400">*</span></label>
+                                <div class="relative">
+                                    <input type="email" id="email" name="Email" value="@Email" class="w-full pt-3 pb-3 pr-3 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-lime-400" required placeholder="Nhập email" />
+                                    <svg class="absolute left-3 top-1/3 -translate-y-1/2 w-5 h-5 text-lime-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path>
+                                    </svg>
+                                </div>
+                                <p id="emailError" class="text-sm text-lime-400 mt-1 hidden"></p>
+                            </div>
+                            <div class="text-sm text-gray-600 dark:text-gray-300 mb-4">
                                 Số điện thoại và email được sử dụng để gửi thông tin đơn hàng và liên hệ khi cần thiết.
                             </div>
-                            <!-- Input ẩn để lưu danh sách ghế và tổng giá vé -->
-                            <input type="hidden" id="selected-seats-input" name="listSeats">
-                            <input type="hidden" id="total-price-input" name="TotalPrice">
-
-                            <!-- Nút đặt vé -->
-                            <button type="button" onclick="submitBooking()" class="btn btn-primary" style="width: 100%; height: 45px;">
-                                Đặt vé
-                            </button>
+                            <input type="hidden" id="selected-seats-input" name="listSeats" />
+                            <input type="hidden" id="total-price-input" name="TotalPrice" />
+                            <button type="button" onclick="submitBooking()" class="w-full py-2 bg-lime-400 text-white rounded-lg hover:bg-lime-500 transition">Đặt Vé</button>
                         </form>
-
                     </div>
                 </div>
 
-            </div>
-            <!-- Thông tin chuyến đi và tổng giá vé -->
-            <div class="col-md-3">
-                <!-- Tổng giá vé -->
-                <div class="card mb-4 ">
-                    <div class="card-header bg-primary text-white ">
-                        Tổng giá vé
+                <!-- Trip Information & Total Price -->
+                <div class="col-span-2 col-start-6">
+                    <!-- Total Price -->
+                    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-lg mb-6">
+                        <h2 class="text-lg font-bold text-gray-800 dark:text-white mb-4">Tổng Giá Vé</h2>
+                        <p class="text-xl font-semibold text-gray-700 dark:text-white">Tổng cộng: <span id="total-price">0</span> VND</p>
                     </div>
-                    <div class="card-body">
-                        <h5 class="card-title">Tổng cộng: <span id="total-price">0</span> VND</h5>
-
-
-                    </div>
-                </div>
-                <div class="card mb-4">
-                    <div class="card-header">
-                        Thông tin chuyến đi
-                    </div>
-                    <div class="card-body">
-                        <div class="d-flex align-items-center mb-3">
-                            <img class="me-2" src="https://229a2c9fe669f7b.cmccloud.com.vn/svgIcon/bus_blue_24dp.svg" alt="bus" width="16" height="16">
-                            <h6 class="mb-0 ms-2">Khởi hành:</h6>
-                            <span class="ms-2">@Model.Train.DateStart?.ToShortDateString()</span>
+                    <!-- Trip Information -->
+                    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-lg">
+                        <h2 class="text-lg font-bold text-gray-800 dark:text-white mb-4">Thông Tin Chuyến Đi</h2>
+                        <div class="flex items-center mb-3">
+                            <svg class="w-5 h-5 text-lime-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            <span class="text-sm text-gray-700 dark:text-white">Khởi hành: @Model.Train.DateStart?.ToString("dd-MM-yyyy")</span>
                         </div>
-
-                        <p><strong>Nơi đi:</strong> @Model.Train.IdTrainRouteNavigation.PointStart</p>
-                        <p><strong>Nơi đến:</strong> @Model.Train.IdTrainRouteNavigation.PointEnd</p>
-                        <hr>
-
-                        <div class="d-flex align-items-center mb-3">
-                            <img class="me-2" src="https://229a2c9fe669f7b.cmccloud.com.vn/svgIcon/bus_blue_24dp.svg" alt="bus" width="16" height="16">
-                            <p class="mb-0 ms-2">@Model.Train.NameTrain</p>
+                        <p class="text-sm text-gray-700 dark:text-white"><strong>Nơi đi:</strong> @Model.Train.IdTrainRouteNavigation.PointStart</p>
+                        <p class="text-sm text-gray-700 dark:text-white"><strong>Nơi đến:</strong> @Model.Train.IdTrainRouteNavigation.PointEnd</p>
+                        <hr class="my-3 border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center mb-3">
+                            <svg class="w-5 h-5 text-lime-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            </svg>
+                            <span class="text-sm text-gray-700 dark:text-white">@Model.Train.NameTrain</span>
                         </div>
-
-                        <p><strong>Loại xe:</strong> @Model.VehicleType</p>
-
-                        <div class="selected-seats mt-3" id="selected-seats">
-                            <!-- Selected seats will be displayed here -->
-                        </div>
+                        <p class="text-sm text-gray-700 dark:text-white"><strong>Loại xe:</strong> @Model.VehicleType</p>
+                        <div class="selected-seats mt-4" id="selected-seats"></div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Bootstrap JS and dependencies -->
+</div>
+@section Scripts {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0/js/bootstrap.bundle.min.js"></script>
-
     <script>
+        // Toastr Configuration
+        @* toastr.options = {
+            positionClass: 'toast-bottom-right',
+            progressBar: true,
+            timeOut: 5000
+        }; *@
+
+        // Display TempData Messages
+        const successMessage = '@TempData["SuccessMessage"]';
+        const errorMessage = '@TempData["ErrorMessage"]';
+        if (successMessage) toastr.success(successMessage);
+        if (errorMessage) toastr.error(errorMessage);
+
+        // Seat Selection Logic
         const seatSelection = document.getElementById('seat-selection');
         const selectedSeatsContainer = document.getElementById('selected-seats');
         const totalColumns = 4;
@@ -334,18 +154,24 @@
         const occupiedSeats = @Html.Raw(Json.Serialize(Model.OccupiedSeats.Select(s => s.NameSeat).ToList()));
         const ticketPrice = @Model.Price;
 
+        // Gỡ lỗi ghế đã đặt
+        console.log('Ghế đã đặt:', occupiedSeats);
+
         function createSeat(nameSeat, label) {
             const seat = document.createElement('div');
-            seat.classList.add('seat');
+            seat.classList.add('w-12', 'h-12', 'rounded-md', 'border', 'border-gray-300', 'dark:border-gray-600', 'flex', 'items-center', 'justify-center', 'text-sm', 'cursor-pointer', 'transition');
             if (occupiedSeats.includes(nameSeat)) {
-                seat.classList.add('occupied');
+                seat.classList.add('bg-gray-500', 'text-white', 'cursor-not-allowed');
+            } else {
+                seat.classList.add('bg-gray-200', 'dark:bg-gray-600', 'text-gray-700', 'dark:text-white');
             }
             seat.id = nameSeat;
             seat.innerText = label;
-            seat.addEventListener('mousedown', (event) => {
-                event.preventDefault();
-                if (!seat.classList.contains('occupied')) {
-                    seat.classList.toggle('selected');
+            seat.addEventListener('click', () => {
+                if (!seat.classList.contains('bg-gray-500')) {
+                    seat.classList.toggle('bg-lime-400');
+                    seat.classList.toggle('text-white');
+                    console.log(`Đã chuyển đổi ghế: ${nameSeat}`);
                     updateSelectedSeats();
                     updateTotalPrice();
                 }
@@ -354,67 +180,41 @@
         }
 
         function renderSeats() {
+            seatSelection.innerHTML = '';
             let count = 0;
-            // Loop through each column
             for (let col = 1; col <= totalColumns; col++) {
                 const seatColumn = document.createElement('div');
-                seatColumn.classList.add('seat-column');
-
+                seatColumn.classList.add('flex', 'flex-col', 'gap-2');
                 if (col === 1 || col === 3) {
                     for (let row = 1; row <= seatsPerColumn; row += 2) {
-                        let seatLabel, nameSeat;
-
-                        if (col === 1) {
-                            seatLabel = String.fromCharCode(65) + row;
-                            count += 1;
-                            nameSeat = `Seat ${count}`;
-                        }
-
-                        if (col === 3) {
-                            seatLabel = String.fromCharCode(66) + row;
-                            count += 1;
-                            nameSeat = `Seat ${count}`;
-                        }
-                        const seat = createSeat(nameSeat, seatLabel);
-                        seatColumn.appendChild(seat);
+                        let seatLabel = col === 1 ? `A${row}` : `B${row}`;
+                        count += 1;
+                        let nameSeat = `Seat_${count}`;
+                        seatColumn.appendChild(createSeat(nameSeat, seatLabel));
                     }
                 }
                 if (col === 2 || col === 4) {
                     for (let row = 2; row <= seatsPerColumn; row += 2) {
-                        let seatLabel, nameSeat;
-                        if (col === 2) {
-                            seatLabel = String.fromCharCode(65) + row;
-                            count += 1;
-                            nameSeat = `Seat ${count}`;
-                        }
-                        if (col === 4) {
-                            seatLabel = String.fromCharCode(66) + row;
-                            count += 1;
-                            nameSeat = `Seat ${count}`;
-                        }
-                        const seat = createSeat(nameSeat, seatLabel);
-                        seatColumn.appendChild(seat);
+                        let seatLabel = col === 2 ? `A${row}` : `B${row}`;
+                        count += 1;
+                        let nameSeat = `Seat_${count}`;
+                        seatColumn.appendChild(createSeat(nameSeat, seatLabel));
                     }
                 }
-
-                // Append the column to the seat selection container
                 seatSelection.appendChild(seatColumn);
             }
         }
 
         function updateSelectedSeats() {
             selectedSeatsContainer.innerHTML = '';
-            const selectedSeats = document.querySelectorAll('.seat.selected');
+            const selectedSeats = document.querySelectorAll('#seat-selection .bg-lime-400');
             selectedSeats.forEach(seat => {
                 const seatTag = document.createElement('div');
-                seatTag.classList.add('seat-tag');
+                seatTag.classList.add('inline-block', 'bg-lime-400', 'text-white', 'px-2', 'py-1', 'rounded-md', 'mr-2', 'mb-2', 'cursor-pointer', 'hover:bg-lime-500');
                 seatTag.innerText = seat.innerText;
-
-                const seatId = seat.id;
-                seatTag.setAttribute('data-seat-id', seatId);
-
                 seatTag.addEventListener('click', () => {
-                    seat.classList.remove('selected');
+                    seat.classList.remove('bg-lime-400', 'text-white');
+                    seat.classList.add('bg-gray-200', 'dark:bg-gray-600', 'text-gray-700', 'dark:text-white');
                     updateSelectedSeats();
                     updateTotalPrice();
                 });
@@ -423,47 +223,61 @@
         }
 
         function updateTotalPrice() {
-            const selectedSeats = document.querySelectorAll('.seat.selected').length;
+            const selectedSeats = document.querySelectorAll('#seat-selection .bg-lime-400').length;
             const totalPrice = selectedSeats * ticketPrice;
             document.getElementById('total-price').innerText = totalPrice.toLocaleString();
-            document.getElementById('total-price-input').value = totalPrice; // Update hidden input with total price
+            document.getElementById('total-price-input').value = totalPrice;
         }
 
-
         function submitBooking() {
-            const selectedSeats = document.querySelectorAll('.seat.selected');
+            const selectedSeats = document.querySelectorAll('#seat-selection .bg-lime-400');
             if (selectedSeats.length === 0) {
-                alert('Vui lòng chọn ít nhất một ghế trước khi đặt vé.');
+                toastr.error('Vui lòng chọn ít nhất một ghế trước khi đặt vé.');
                 return;
             }
 
-            const personalInfoForm = document.getElementById('personal-info-form');
-            if (!personalInfoForm.checkValidity()) {
-                alert('Vui lòng điền đầy đủ thông tin cá nhân.');
-                return;
+            const form = document.getElementById('personal-info-form');
+            const userName = document.getElementById('userName');
+            const phone = document.getElementById('phone');
+            const email = document.getElementById('email');
+            let isValid = true;
+
+            document.getElementById('userNameError').classList.add('hidden');
+            document.getElementById('phoneError').classList.add('hidden');
+            document.getElementById('emailError').classList.add('hidden');
+
+            if (!userName.value.match(/^[A-Za-z\s]+$/)) {
+                document.getElementById('userNameError').textContent = 'Tên chỉ chứa chữ cái và khoảng trắng';
+                document.getElementById('userNameError').classList.remove('hidden');
+                isValid = false;
+            }
+            if (!phone.value.match(/^\d{9,10}$/)) {
+                document.getElementById('phoneError').textContent = 'Số điện thoại phải có 9-10 chữ số';
+                document.getElementById('phoneError').classList.remove('hidden');
+                isValid = false;
+            }
+            if (!email.value) {
+                document.getElementById('emailError').textContent = 'Email không hợp lệ';
+                document.getElementById('emailError').classList.remove('hidden');
+                isValid = false;
             }
 
-            // Lấy danh sách ghế đã chọn từ hidden input field
+            if (!isValid) return;
+
             const selectedSeatsList = Array.from(selectedSeats).map(seat => seat.id);
-
-            // Update hidden input fields với danh sách ghế và tổng giá vé
             document.getElementById('selected-seats-input').value = JSON.stringify(selectedSeatsList);
-            document.getElementById('total-price-input').value = document.getElementById('total-price').innerText;
-
-            // Submit form
-            personalInfoForm.submit();
+            form.submit();
         }
 
         function clearAllSelections() {
-            const selectedSeats = document.querySelectorAll('.seat.selected');
-            selectedSeats.forEach(seat => {
-                seat.classList.remove('selected');
+            document.querySelectorAll('#seat-selection .bg-lime-400').forEach(seat => {
+                seat.classList.remove('bg-lime-400', 'text-white');
+                seat.classList.add('bg-gray-200', 'dark:bg-gray-600', 'text-gray-700', 'dark:text-white');
             });
-            updateTotalPrice();
             updateSelectedSeats();
+            updateTotalPrice();
         }
 
         document.addEventListener('DOMContentLoaded', renderSeats);
     </script>
-</body>
-</html>
+}

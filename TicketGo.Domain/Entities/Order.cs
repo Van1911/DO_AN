@@ -19,8 +19,8 @@ namespace TicketGo.Domain.Entities
         public string? Phone { get; set; }
         public int? IdCus { get; set; }
 
-        public virtual Customer? IdCusNavigation { get; set; }= null!;
-        public virtual Discount? IdDiscountNavigation { get; set; }
+        public virtual Account IdAccountNavigation { get; set; }
+        public virtual Discount? IdDiscountNavigation { get; set; }=null;
         public virtual ICollection<OrderTicket> OrderTickets { get; set; }
     }
 }

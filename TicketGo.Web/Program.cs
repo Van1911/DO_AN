@@ -28,7 +28,6 @@ builder.Services.AddSession(options =>
 
 // Repositories
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
-builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ITicketRepository, TicketRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<ITrainRepository, TrainRepository>();

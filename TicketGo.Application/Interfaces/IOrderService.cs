@@ -7,9 +7,8 @@ namespace TicketGo.Application.Interfaces
         Task<OrderTicketDto> GetOrderTicketDetailsAsync(int idCoach);
         Task<List<OrderDto>> GetAllOrdersAsync();
         Task<OrderDto> GetOrderByIdAsync(int id);
-        Task CreateOrderAsync(CreateUpdateOrderDto orderDto);
-        Task UpdateOrderAsync(int id, CreateUpdateOrderDto orderDto);
+        Task CreateOrderAsync(OrderDto orderDto);
+        Task UpdateOrderAsync(int id, OrderDto orderDto);
         Task DeleteOrderAsync(int id);
-        Task<List<CustomerDto>> GetAllCustomersAsync();
     }
 }

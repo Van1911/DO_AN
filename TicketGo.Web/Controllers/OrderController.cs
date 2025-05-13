@@ -27,26 +27,20 @@ namespace TicketGo.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(int? idCoach)
+        public async Task<IActionResult> Index(int idCoach)
         {
             if (!IsUserLoggedIn())
             {
                 return RedirectToAction("Login", "Access");
             }
 
-            HttpContext.Session.SetInt32("idCoach", idCoach ?? 0);
-
-            if (idCoach == null)
-            {
-                return NotFound();
-            }
-
-            var viewModel = await _orderService.GetOrderTicketDetailsAsync(idCoach.Value);
+            var viewModel = await _orderService.GetOrderTicketDetailsAsync(idCoach);
             if (viewModel == null)
             {
                 return NotFound();
             }
-
+            // Lưu thông tin vào Session
+            HttpContext.Session.SetInt32("CoachID", idCoach);
             return View(viewModel);
         }
 
@@ -62,11 +56,11 @@ namespace TicketGo.Web.Controllers
             {
                 return NotFound();
             }
-
+            // Lấy thông tin người dùng từ Session
             var httpContext = _httpContextAccessor.HttpContext;
-            var idCustomer = httpContext.Session.GetInt32("UserID");
+            var IdAccount = httpContext.Session.GetInt32("AccountID");
 
-            if (idCustomer == null)
+            if (IdAccount == null)
             {
                 return NotFound();
             }
@@ -78,13 +72,13 @@ namespace TicketGo.Web.Controllers
             HttpContext.Session.SetString("Phone", Phone);
             HttpContext.Session.SetString("Email", Email);
             HttpContext.Session.SetString("TotalPrice", TotalPrice.ToString());
-
+           
             // Chuẩn bị dữ liệu cho VnPay
             string idOrder = DateTime.Now.ToString("yyyyMMdd");
             int orderId = Convert.ToInt32(idOrder);
             var vnPayModel = new VnPayRequestDto
             {
-                Amount = (double)TotalPrice * 1000,
+                Amount = (double)TotalPrice,
                 CreatedDate = DateTime.Now,
                 Description = "Thanh toán",
                 Fullname = Fullname,
@@ -107,25 +101,25 @@ namespace TicketGo.Web.Controllers
         public async Task<IActionResult> PaymentCallBack()
         {
             var fullname = HttpContext.Session.GetString("Fullname");
-            var idCustomer = HttpContext.Session.GetInt32("UserID");
+            var IdAccount = HttpContext.Session.GetInt32("AccountID");
             var phone = HttpContext.Session.GetString("Phone");
             var email = HttpContext.Session.GetString("Email");
             var totalPrice = decimal.Parse(HttpContext.Session.GetString("TotalPrice"));
-            var idCoach = HttpContext.Session.GetInt32("idCoach");
+            var idCoach = HttpContext.Session.GetInt32("CoachID");
 
             string jsonSeats = HttpContext.Session.GetString("SelectedSeats");
             List<string> listSeats = JsonConvert.DeserializeObject<List<string>>(jsonSeats);
             string listSeatsFinal = listSeats.First();
             List<string> seats = JsonConvert.DeserializeObject<List<string>>(listSeatsFinal);
 
-            var createOrderDto = new CreateUpdateOrderDto
+            var createOrderDto = new OrderDto
             {
                 ListSeats = seats,
                 NameCus = fullname,
                 Phone = phone,
                 TotalPrice = (double)totalPrice,
-                IdCoach = idCoach ?? 0,
-                IdCus = idCustomer ?? 0
+                IdCoach = idCoach,
+                IdAccount = IdAccount
             };
 
             await _orderService.CreateOrderAsync(createOrderDto);

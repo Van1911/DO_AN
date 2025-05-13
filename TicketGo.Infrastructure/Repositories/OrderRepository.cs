@@ -17,7 +17,7 @@ namespace TicketGo.Infrastructure.Repositories
         public async Task<List<Order>> GetAllAsync()
         {
             return await _context.Orders
-                .Include(o => o.IdCusNavigation)
+                .Include(o => o.IdAccountNavigation)
                 .Include(o => o.IdDiscountNavigation)
                 .Include(o => o.OrderTickets)
                 .ToListAsync();
@@ -26,7 +26,7 @@ namespace TicketGo.Infrastructure.Repositories
         public async Task<Order> GetByIdAsync(int id)
         {
             var order = await _context.Orders
-                .Include(o => o.IdCusNavigation)
+                .Include(o => o.IdAccountNavigation)
                 .Include(o => o.IdDiscountNavigation)
                 .Include(o => o.OrderTickets)
                 .FirstOrDefaultAsync(o => o.IdOrder == id);

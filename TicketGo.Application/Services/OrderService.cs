@@ -7,7 +7,6 @@ namespace TicketGo.Application.Services
 {
     public class OrderService : IOrderService
     {
-        private readonly ICustomerRepository _customerRepository;
         private readonly IDiscountRepository _discountRepository;
         private readonly ICoachRepository _coachRepository;
         private readonly IOrderRepository _orderRepository;
@@ -21,7 +20,6 @@ namespace TicketGo.Application.Services
             ISeatRepository seatRepository,
             ITicketRepository ticketRepository,
             IOrderTicketRepository orderTicketRepository,
-            ICustomerRepository customerRepository,
             IDiscountRepository discountRepository)
         {
             _coachRepository = coachRepository;
@@ -29,7 +27,6 @@ namespace TicketGo.Application.Services
             _seatRepository = seatRepository;
             _ticketRepository = ticketRepository;
             _orderTicketRepository = orderTicketRepository;
-            _customerRepository = customerRepository;
             _discountRepository = discountRepository;
         }
 
@@ -46,8 +43,7 @@ namespace TicketGo.Application.Services
                 DiscountName = o.IdDiscountNavigation?.IdDiscount.ToString(),
                 NameCus = o.NameCus,
                 Phone = o.Phone,
-                IdCus = o.IdCus,
-                CustomerName = o.IdCusNavigation?.FullName
+                IdAccount = o.IdAccountNavigation.IdAccount,
             }).ToList();
         }
 
@@ -69,8 +65,7 @@ namespace TicketGo.Application.Services
                 DiscountName = order.IdDiscountNavigation?.IdDiscount.ToString(),
                 NameCus = order.NameCus,
                 Phone = order.Phone,
-                IdCus = order.IdCus,
-                CustomerName = order.IdCusNavigation?.FullName
+                IdAccount = order.IdAccountNavigation.IdAccount,
             };
         }
 
@@ -89,16 +84,16 @@ namespace TicketGo.Application.Services
             return CreateOrderTicketDto(coach, occupiedSeats, coachCategory, ticketPrice);
         }
 
-        public async Task CreateOrderAsync(CreateUpdateOrderDto orderDto)
+        public async Task CreateOrderAsync(OrderDto orderDto)
         {
             var order = new Order
             {
-                UnitPrice = orderDto.TotalPrice ?? 0,
+                UnitPrice = orderDto.TotalPrice,
                 DateOrder = orderDto.DateOrder ?? DateTime.Now,
                 NameCus = orderDto.NameCus,
                 Phone = orderDto.Phone,
-                IdCus = orderDto.IdCus,
-                IdDiscount = orderDto.IdDiscount ?? 0
+                IdCus = orderDto.IdAccount,
+                IdDiscount = orderDto.IdDiscount ?? null
             };
 
             await _orderRepository.AddAsync(order);
@@ -160,7 +155,7 @@ namespace TicketGo.Application.Services
             };
         }
 
-        public async Task UpdateOrderAsync(int id, CreateUpdateOrderDto orderDto)
+        public async Task UpdateOrderAsync(int id, OrderDto orderDto)
         {
             var order = await _orderRepository.GetByIdAsync(id);
             if (order == null)
@@ -174,7 +169,7 @@ namespace TicketGo.Application.Services
             order.IdDiscount = orderDto.IdDiscount ?? 0;
             order.NameCus = orderDto.NameCus;
             order.Phone = orderDto.Phone;
-            order.IdCus = orderDto.IdCus ?? 0; // Sử dụng orderDto, không phải Coach
+            order.IdCus = orderDto.IdAccount; // Sử dụng orderDto, không phải Coach
 
             await _orderRepository.UpdateAsync(order);
         }
@@ -184,14 +179,5 @@ namespace TicketGo.Application.Services
             await _orderRepository.DeleteAsync(id);
         }
 
-        public async Task<List<CustomerDto>> GetAllCustomersAsync()
-        {
-            var customers = await _customerRepository.GetAllAsync();
-            return customers.Select(c => new CustomerDto
-            {
-                IdCus = c.IdCus,
-                CustomerName = c.FullName
-            }).ToList();
-        }
     }
 }
