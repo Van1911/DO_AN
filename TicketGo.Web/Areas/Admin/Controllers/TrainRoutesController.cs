@@ -94,10 +94,10 @@ namespace TicketGo.Web.Areas.Admin.Controllers
 
             try
             {
-                var existingRoute = await _trainRouteService.GetTrainRouteByIdAsync(trainRouteDto.IdTrainRoute);
+                var existingRoute = await _trainRouteService.GetTrainRouteByIdAsync(trainRouteDto.IdTrainRoute.Value);
                 if (existingRoute == null) return NotFound();
 
-                await _trainRouteService.UpdateTrainRouteAsync(trainRouteDto.IdTrainRoute, trainRouteDto);
+                await _trainRouteService.UpdateTrainRouteAsync(trainRouteDto.IdTrainRoute.Value, trainRouteDto);
                 TempData["SuccessMessage"] = "Tuyến đường đã được cập nhật!";
 
                 return RedirectToAction(nameof(Index));

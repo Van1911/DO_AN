@@ -30,6 +30,7 @@ namespace TicketGo.Application.DTOs
             public DateTime GioKhoiHanh { get; set; }
             public decimal? GiaVe { get; set; }
             public string? LoaiXe { get; set; }
+            public int CoachID { get; set; } 
         }
 
 }

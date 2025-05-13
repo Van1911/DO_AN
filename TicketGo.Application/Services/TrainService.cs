@@ -52,7 +52,8 @@ namespace TicketGo.Application.Services
                     NoiDen = train.IdTrainRouteNavigation?.PointEnd ?? "N/A",
                     GioKhoiHanh = train.DateStart.HasValue ? train.DateStart.Value : default(DateTime),
                     GiaVe = coach != null ? (decimal?)coach.BasicPrice : null,
-                    LoaiXe = coach?.Category ?? "N/A"
+                    LoaiXe = coach?.Category ?? "N/A",
+                    CoachID = coach.IdCoach 
                 };
             }).ToList();
 

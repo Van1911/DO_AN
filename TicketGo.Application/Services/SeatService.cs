@@ -24,7 +24,7 @@ namespace TicketGo.Application.Services
             {
                 seats.Add(new Seat
                 {
-                    NameSeat = $"S-{i}",
+                    NameSeat = $"Seat_{i}",
                     State = false,
                     IdCoach = coachId
                 });
