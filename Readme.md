@@ -76,5 +76,5 @@ TicketGo/
 ├── TicketGo.Application      # Lớp ứng dụng - chứa logic nghiệp vụ
 ├── TicketGo.Domain           # Lớp domain - các thực thể và interface
 ├── TicketGo.Infrastructure   # Kết nối DB, repo, cấu hình DI
-├── TicketGo.Web              # Giao diện người dùng (ASP.NET Core Razor Pages)
-└── TicketGo.Tests            # Các bài test (nếu có)
+└── TicketGo.Web              # Giao diện người dùng (ASP.NET Core Razor Pages)
+
